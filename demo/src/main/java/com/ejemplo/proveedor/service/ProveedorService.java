@@ -3,7 +3,6 @@ package com.ejemplo.proveedor.service;
 
 import com.ejemplo.proveedor.model.Proveedor;
 import com.ejemplo.proveedor.repository.ProveedorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +12,11 @@ import java.util.Optional;
 @Service
 public class ProveedorService {
 
-  @Autowired
-  private ProveedorRepository repository;
+  private final ProveedorRepository repository;
+
+  public ProveedorService(ProveedorRepository repository) {
+    this.repository = repository;
+  }
 
   @Transactional(readOnly = true)
   public List<Proveedor> listar() {
@@ -22,8 +24,8 @@ public class ProveedorService {
   }
 
   @Transactional(readOnly = true)
-  public Optional<Proveedor> obtener(Long id) {
-    return repository.findById(id);
+  public Optional<Proveedor> obtener(String clvprv) {
+    return repository.findById(clvprv);
   }
 
   @Transactional
@@ -32,12 +34,32 @@ public class ProveedorService {
   }
 
   @Transactional
-  public void eliminar(Long id) {
-    repository.deleteById(id);
+  public boolean actualizar(String clvprv, Proveedor datos) {
+    return repository.findById(clvprv).map(proveedor -> {
+      proveedor.setNomprv(datos.getNomprv());
+      proveedor.setTipprv(datos.getTipprv());
+      proveedor.setRfcprv(datos.getRfcprv());
+      proveedor.setTelprv(datos.getTelprv());
+      proveedor.setCorrprv(datos.getCorrprv());
+      proveedor.setDirprv(datos.getDirprv());
+      proveedor.setCodpos(datos.getCodpos());
+      proveedor.setEstprv(datos.getEstprv());
+      proveedor.setClabe(datos.getClabe());
+      repository.save(proveedor);
+      return true;
+    }).orElse(false);
   }
 
   @Transactional(readOnly = true)
-  public boolean existePorRuc(String ruc) {
-    return repository.existsByRuc(ruc);
+  public boolean existePorRfcprv(String rfcprv) {
+    return repository.existsByRfcprv(rfcprv);
+  }
+
+  @Transactional
+  public boolean eliminar(String clvprv) {
+    return repository.findById(clvprv).map(proveedor -> {
+      repository.delete(proveedor);
+      return true;
+    }).orElse(false);
   }
 }

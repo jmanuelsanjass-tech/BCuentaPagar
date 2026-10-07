@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Spring Boot (Maven)",
+      "request": "launch",
+      "mainClass": "com.example.demo.DemoApplication",
+      "projectName": "demo",
+      "args": "",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    },
+    {
+      "type": "java",
+      "name": "Debug Spring Boot (Maven Test)",
+      "request": "launch",
+      "mainClass": "org.springframework.boot.loader.JarLauncher",
+      "cwd": "${workspaceFolder}",
+      "args": "",
+      "vmArgs": "-Dspring.profiles.active=test"
+    }
+  ]
+}

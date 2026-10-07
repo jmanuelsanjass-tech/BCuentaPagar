@@ -1,4 +1,8 @@
 {
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "workbench.colorTheme": "Visual Studio Dark",
+  "chat.planAgent.defaultModel": "Auto (copilot)",
+  "telemetry.feedback.enabled": false,
+  "telemetry.editStats.enabled": false
 }
