@@ -1,6 +1,5 @@
 name: Backend CI/CD
 
-
 on:
   push:
     branches: [ "main" ]
@@ -24,3 +23,19 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B clean package --file pom.xml
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Ejemplo: despliegue en Heroku
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          git remote add heroku https://git.heroku.com/tu-app.git
+          git push heroku main
