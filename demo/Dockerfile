@@ -3,11 +3,11 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copiamos pom.xml y descargamos dependencias
-COPY pom.xml .
+COPY demo/pom.xml .
 RUN mvn dependency:go-offline
 
 # Copiamos el código fuente y compilamos
-COPY src ./src
+COPY demo/src ./src
 RUN mvn clean package -DskipTests
 
 # Etapa 2: Runtime con JDK 21
