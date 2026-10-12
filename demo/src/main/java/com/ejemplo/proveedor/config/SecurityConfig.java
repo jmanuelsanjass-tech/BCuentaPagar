@@ -5,7 +5,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -84,22 +83,11 @@ public class SecurityConfig {
                     || "/api/auth/logout".equals(request.getServletPath())))
                 || ("PUT".equals(request.getMethod())
                     && request.getServletPath().startsWith("/api/clientes/"))))
-        .authorizeHttpRequests(authorize -> authorize.dispatcherTypeMatchers(DispatcherType.ERROR)
-            .permitAll()
-            .requestMatchers(
-                HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/logout")
-            .permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/proveedores").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/proveedores").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/clientes", "/api/clientes/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
-            .requestMatchers(HttpMethod.PUT, "/api/clientes/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/productos", "/api/productos/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/productos").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/ventas", "/api/ventas/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/ventas").permitAll()
-            .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll().anyRequest()
-            .authenticated())
+        .authorizeHttpRequests(authorize -> authorize
+            .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+            .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers("/api/public/**").permitAll()
+            .anyRequest().authenticated())
         .formLogin(form -> form.disable());
 
     return http.build();
