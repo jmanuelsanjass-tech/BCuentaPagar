@@ -73,20 +73,12 @@ public class SecurityConfig {
         .securityContext(securityContext ->
             securityContext.securityContextRepository(securityContextRepository))
         .cors(Customizer.withDefaults())
-        .csrf(csrf -> csrf.ignoringRequestMatchers(request ->
-            ("POST".equals(request.getMethod())
-                && ("/api/proveedores".equals(request.getServletPath())
-                    || "/api/productos".equals(request.getServletPath())
-                    || "/api/clientes".equals(request.getServletPath())
-                    || "/api/auth/register".equals(request.getServletPath())
-                    || "/api/auth/login".equals(request.getServletPath())
-                    || "/api/auth/logout".equals(request.getServletPath())))
-                || ("PUT".equals(request.getMethod())
-                    && request.getServletPath().startsWith("/api/clientes/"))))
+        .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorize -> authorize
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+            .requestMatchers("/").permitAll()
             .requestMatchers("/actuator/health").permitAll()
-            .requestMatchers("/api/public/**").permitAll()
+            .requestMatchers("/api/auth/**").permitAll()
             .anyRequest().authenticated())
         .formLogin(form -> form.disable());
 
