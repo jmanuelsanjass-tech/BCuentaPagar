@@ -1,36 +1,54 @@
-HELP.md
+# Compiled class files
+*.class
+
+# Logs
+*.log
+hs_err_pid*.log
+replay_pid*.log
+app.log
+
+# Maven
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
-### Archivos de entorno ###
+# Environment (¡CRÍTICO! No subir credenciales)
 .env
+.env.local
+.env.production
 
-### STS ###
-.apt_generated
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
 .classpath
 .factorypath
-.project
-.settings
+.apt_generated
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+.git-monorepo-backup/
+*.bak
