@@ -1,85 +1,86 @@
 package com.ejemplo.proveedor.model;
 
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Data;
+import org.hibernate.annotations.Check;
 
 @Entity
-@Table(name = "clientes", schema = "public")
+@Table(name = "clientes", schema = "public", indexes = {
+    @Index(name = "idx_clientes_nombre", columnList = "nombre"),
+    @Index(name = "idx_clientes_correo", columnList = "correo")
+})
+@Check(name = "chk_estado_direccion", constraints = "estado_direccion IN ('Aguascalientes','Baja California','Baja California Sur',"
+    + "'Campeche','Coahuila','Colima','Chiapas','Chihuahua','Ciudad de México',"
+    + "'Durango','Guanajuato','Guerrero','Hidalgo','Jalisco','México','Michoacán',"
+    + "'Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo',"
+    + "'San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala',"
+    + "'Veracruz','Yucatán','Zacatecas')")
+@Check(name = "chk_telefono", constraints = "telefono ~ '^[0-9]{10}$'")
+@Check(name = "chk_correo", constraints = "correo ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'")
 @Data
 public class Cliente {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Column(name = "id_cliente")
+  private Long idCliente;
 
-  @NotBlank(message = "El nombre comercial es obligatorio")
-  @Size(max = 150)
-  @Column(name = "nombre_comercial", nullable = false, length = 150)
-  private String nombreComercial;
-
-  @NotBlank(message = "La razón social es obligatoria")
-  @Size(max = 200)
-  @Column(name = "razon_social", nullable = false, length = 200)
-  private String razonSocial;
-
-  @NotBlank(message = "El RFC es obligatorio")
-  @Pattern(regexp = "^[\\s\\S]{12,13}$", message = "El RFC debe contener 12 o 13 caracteres")
-  @Column(nullable = false, unique = true, length = 13)
-  private String rfc;
-
-  @NotBlank(message = "La situación fiscal es obligatoria")
+  @NotBlank(message = "El nombre es obligatorio")
   @Size(max = 100)
-  @Column(name = "situacion_fiscal", nullable = false, length = 100)
-  private String situacionFiscal;
+  @Column(nullable = false, length = 100)
+  private String nombre;
 
-  @NotBlank(message = "El tipo de cliente es obligatorio")
-  @Pattern(
-      regexp = "Escuela privada|Persona física|Persona moral|Otro",
-      message = "El tipo de cliente no es válido")
-  @Column(name = "tipo_cliente", nullable = false, length = 50)
-  private String tipoCliente;
+  @NotBlank(message = "El teléfono es obligatorio")
+  @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe contener exactamente 10 dígitos")
+  @Column(nullable = false, length = 10)
+  private String telefono;
+
+  @NotBlank(message = "El correo es obligatorio")
+  @Pattern(regexp = "(?i)^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "El correo electrónico no tiene un formato válido")
+  @Column(nullable = false, unique = true, length = 100)
+  private String correo;
 
   @Size(max = 200)
   @Column(length = 200)
   private String direccion;
 
-  @Size(max = 100)
-  @Column(length = 100)
-  private String colonia;
+  @NotBlank(message = "El estado de la dirección es obligatorio")
+  @Pattern(regexp = "Aguascalientes|Baja California|Baja California Sur|Campeche|Coahuila|Colima|"
+      + "Chiapas|Chihuahua|Ciudad de México|Durango|Guanajuato|Guerrero|Hidalgo|"
+      + "Jalisco|México|Michoacán|Morelos|Nayarit|Nuevo León|Oaxaca|Puebla|Querétaro|"
+      + "Quintana Roo|San Luis Potosí|Sinaloa|Sonora|Tabasco|Tamaulipas|Tlaxcala|"
+      + "Veracruz|Yucatán|Zacatecas", message = "El estado de la dirección no es válido")
+  @Column(name = "estado_direccion", nullable = false, length = 50)
+  private String estadoDireccion;
 
-  @Size(max = 100)
-  @Column(length = 100)
-  private String ciudad;
+  @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "date default current_date")
+  private LocalDate fechaRegistro;
 
-  @Size(max = 150)
-  @Column(length = 150)
-  private String contacto;
+  @Pattern(regexp = "activo|inactivo|prospecto", message = "El estado del cliente debe ser activo, inactivo o prospecto")
+  @Column(name = "estado", nullable = false, length = 20, columnDefinition = "varchar(20) default 'activo'")
+  private String estado = "activo";
 
-  @Size(max = 100)
-  @Column(length = 100)
-  private String banco;
+  @Column(name = "historial_compras", columnDefinition = "text")
+  private String historialCompras;
 
-  @Size(max = 20)
-  @Column(name = "cuenta_bancaria", length = 20)
-  private String cuentaBancaria;
-
-  @Size(min = 18, max = 18, message = "La CLABE debe contener exactamente 18 caracteres")
-  @Column(length = 18)
-  private String clabe;
+  @Column(name = "fecha_auditoria", insertable = false, updatable = false, columnDefinition = "timestamp default current_timestamp")
+  private LocalDateTime fechaAuditoria;
 
   @Size(max = 50)
-  @Column(name = "forma_pago", length = 50)
-  private String formaPago = "Transferencia";
+  @Column(name = "usuario_auditoria", length = 50)
+  private String usuarioAuditoria;
 
-  @Column(name = "fecha_alta", insertable = false, updatable = false)
-  private LocalDateTime fechaAlta;
+  @Column(name = "qr_code", columnDefinition = "bytea")
+  private byte[] qrCode;
 }

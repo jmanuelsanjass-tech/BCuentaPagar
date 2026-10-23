@@ -60,20 +60,16 @@ public class ClienteService {
   }
 
   private void aplicar(Cliente cliente, ClienteRequest request) {
-    cliente.setNombreComercial(request.nombreComercial());
-    cliente.setRazonSocial(request.razonSocial());
-    cliente.setRfc(request.rfc());
-    cliente.setSituacionFiscal(request.situacionFiscal());
-    cliente.setTipoCliente(request.tipoCliente());
+    cliente.setNombre(request.nombre());
+    cliente.setTelefono(request.telefono());
+    cliente.setCorreo(request.correo());
     cliente.setDireccion(request.direccion());
-    cliente.setColonia(request.colonia());
-    cliente.setCiudad(request.ciudad());
-    cliente.setContacto(request.contacto());
-    cliente.setBanco(request.banco());
-    cliente.setCuentaBancaria(request.cuentaBancaria());
-    cliente.setClabe(request.clabe());
-    cliente.setFormaPago(
-        request.formaPago() == null ? "Transferencia" : request.formaPago());
+    cliente.setEstadoDireccion(request.estadoDireccion());
+    if (request.estado() != null) {
+      cliente.setEstado(request.estado());
+    }
+    cliente.setHistorialCompras(request.historialCompras());
+    cliente.setQrCode(request.qrCode());
   }
 
   private ClienteResponse cargar(Long id) {
@@ -84,20 +80,17 @@ public class ClienteService {
 
   private ClienteResponse toResponse(Cliente cliente) {
     return new ClienteResponse(
-        cliente.getId(),
-        cliente.getNombreComercial(),
-        cliente.getRazonSocial(),
-        cliente.getRfc(),
-        cliente.getSituacionFiscal(),
-        cliente.getTipoCliente(),
+        cliente.getIdCliente(),
+        cliente.getNombre(),
+        cliente.getTelefono(),
+        cliente.getCorreo(),
         cliente.getDireccion(),
-        cliente.getColonia(),
-        cliente.getCiudad(),
-        cliente.getContacto(),
-        cliente.getBanco(),
-        cliente.getCuentaBancaria(),
-        cliente.getClabe(),
-        cliente.getFormaPago(),
-        cliente.getFechaAlta());
+        cliente.getEstadoDireccion(),
+        cliente.getFechaRegistro(),
+        cliente.getEstado(),
+        cliente.getHistorialCompras(),
+        cliente.getFechaAuditoria(),
+        cliente.getUsuarioAuditoria(),
+        cliente.getQrCode());
   }
 }
