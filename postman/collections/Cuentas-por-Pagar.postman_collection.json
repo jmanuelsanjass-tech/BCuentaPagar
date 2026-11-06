@@ -245,7 +245,7 @@
             "url": { "raw": "{{baseUrl}}/api/ventas", "host": ["{{baseUrl}}"], "path": ["api","ventas"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": 1,\n  \"descuento\": 0.00,\n  \"iva\": 4.00,\n  \"estado\": \"completada\",\n  \"detalles\": [\n    { \"codigoBarras\": \"7501234567890\", \"cantidad\": 2, \"precioUnitario\": 12.50 }\n  ]\n}"
+              "raw": "{\n  \"clienteId\": 1,\n  \"descuento\": 0.00,\n  \"estado\": \"completada\",\n  \"detalles\": [\n    { \"idProducto\": 1, \"cantidad\": 2, \"precioUnitario\": 12.50, \"descuento\": 0.00 }\n  ]\n}"
             }
           }
         },
@@ -257,7 +257,7 @@
             "url": { "raw": "{{baseUrl}}/api/ventas/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","ventas","{{id}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": 1,\n  \"descuento\": 2.50,\n  \"iva\": 6.00,\n  \"estado\": \"completada\",\n  \"detalles\": [\n    { \"codigoBarras\": \"7501234567890\", \"cantidad\": 3, \"precioUnitario\": 12.50 }\n  ]\n}"
+              "raw": "{\n  \"clienteId\": 1,\n  \"descuento\": 2.50,\n  \"estado\": \"completada\",\n  \"detalles\": [\n    { \"idProducto\": 1, \"cantidad\": 3, \"precioUnitario\": 12.50, \"descuento\": 0.00 }\n  ]\n}"
             }
           }
         },

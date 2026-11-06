@@ -5,6 +5,7 @@ import com.ejemplo.proveedor.dto.VentaDetalleResponse;
 import com.ejemplo.proveedor.dto.VentaRequest;
 import com.ejemplo.proveedor.dto.VentaResponse;
 import com.ejemplo.proveedor.model.Cliente;
+import com.ejemplo.proveedor.model.Producto;
 import com.ejemplo.proveedor.model.Venta;
 import com.ejemplo.proveedor.model.VentaDetalle;
 import com.ejemplo.proveedor.repository.VentaRepository;
@@ -75,17 +76,28 @@ public class VentaService {
         .map(this::toDetalle)
         .toList();
     BigDecimal subtotal = BigDecimal.ZERO;
+    BigDecimal descuentoDetalles = BigDecimal.ZERO;
+    BigDecimal iva = BigDecimal.ZERO;
     for (VentaDetalle detalle : detalles) {
-      BigDecimal importe = detalle.getCantidad()
+      BigDecimal importe = BigDecimal.valueOf(detalle.getCantidad())
           .multiply(detalle.getPrecioUnitario())
           .setScale(2, RoundingMode.HALF_UP);
+      if (detalle.getDescuento().compareTo(importe) > 0) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "El descuento no puede exceder el subtotal del detalle");
+      }
       subtotal = subtotal.add(importe);
+      descuentoDetalles = descuentoDetalles.add(detalle.getDescuento());
+      iva = iva.add(importe.subtract(detalle.getDescuento())
+          .multiply(new BigDecimal("0.16"))
+          .setScale(2, RoundingMode.HALF_UP));
     }
 
-    BigDecimal descuento = request.descuento() == null
+    BigDecimal descuentoVenta = request.descuento() == null
         ? BigDecimal.ZERO
         : request.descuento().setScale(2, RoundingMode.HALF_UP);
-    BigDecimal iva = request.iva().setScale(2, RoundingMode.HALF_UP);
+    BigDecimal descuento = descuentoVenta.add(descuentoDetalles).setScale(2, RoundingMode.HALF_UP);
+    iva = iva.setScale(2, RoundingMode.HALF_UP);
     if (descuento.compareTo(subtotal) > 0) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "El descuento no puede exceder el subtotal");
@@ -115,9 +127,13 @@ public class VentaService {
 
   private VentaDetalle toDetalle(VentaDetalleRequest request) {
     VentaDetalle detalle = new VentaDetalle();
-    detalle.setCodigoBarras(request.codigoBarras());
+    detalle.setProducto(entityManager.getReference(Producto.class, request.idProducto()));
     detalle.setCantidad(request.cantidad());
     detalle.setPrecioUnitario(request.precioUnitario());
+    detalle.setDescuento(request.descuento() == null
+        ? BigDecimal.ZERO
+        : request.descuento().setScale(2, RoundingMode.HALF_UP));
+    detalle.setUsuarioAuditoria(usuarioAutenticado());
     return detalle;
   }
 
@@ -141,10 +157,14 @@ public class VentaService {
     List<VentaDetalleResponse> detalles = venta.getDetalles().stream()
         .map(detalle -> new VentaDetalleResponse(
             detalle.getDetalleId(),
-            detalle.getCodigoBarras(),
+            detalle.getProducto().getIdProducto(),
+            detalle.getProducto().getCodigoBarras(),
             detalle.getCantidad(),
             detalle.getPrecioUnitario(),
-            detalle.getImporte()))
+            detalle.getSubtotal(),
+            detalle.getDescuento(),
+            detalle.getIva(),
+            detalle.getTotal()))
         .toList();
     return new VentaResponse(
         venta.getIdVenta(),

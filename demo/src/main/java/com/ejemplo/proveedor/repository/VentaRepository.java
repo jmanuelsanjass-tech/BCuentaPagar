@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface VentaRepository extends JpaRepository<Venta, Long> {
 
   @Override
-  @EntityGraph(attributePaths = "detalles")
+  @EntityGraph(attributePaths = {"detalles", "detalles.producto"})
   List<Venta> findAll();
 
-  @EntityGraph(attributePaths = "detalles")
+  @EntityGraph(attributePaths = {"detalles", "detalles.producto"})
   Optional<Venta> findWithDetailsByIdVenta(Long idVenta);
 }
