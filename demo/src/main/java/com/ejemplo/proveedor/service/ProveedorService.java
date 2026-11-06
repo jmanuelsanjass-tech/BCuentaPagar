@@ -24,8 +24,8 @@ public class ProveedorService {
   }
 
   @Transactional(readOnly = true)
-  public Optional<Proveedor> obtener(String clvprv) {
-    return repository.findById(clvprv);
+  public Optional<Proveedor> obtener(Long idProveedor) {
+    return repository.findById(idProveedor);
   }
 
   @Transactional
@@ -34,30 +34,30 @@ public class ProveedorService {
   }
 
   @Transactional
-  public boolean actualizar(String clvprv, Proveedor datos) {
-    return repository.findById(clvprv).map(proveedor -> {
-      proveedor.setNomprv(datos.getNomprv());
-      proveedor.setTipprv(datos.getTipprv());
-      proveedor.setRfcprv(datos.getRfcprv());
-      proveedor.setTelprv(datos.getTelprv());
-      proveedor.setCorrprv(datos.getCorrprv());
-      proveedor.setDirprv(datos.getDirprv());
-      proveedor.setCodpos(datos.getCodpos());
-      proveedor.setEstprv(datos.getEstprv());
-      proveedor.setClabe(datos.getClabe());
+  public boolean actualizar(Long idProveedor, Proveedor datos) {
+    return repository.findById(idProveedor).map(proveedor -> {
+      proveedor.setNombre(datos.getNombre());
+      proveedor.setTelefono(datos.getTelefono());
+      proveedor.setCorreo(datos.getCorreo());
+      proveedor.setDireccion(datos.getDireccion());
+      proveedor.setEstadoDireccion(datos.getEstadoDireccion());
+      proveedor.setEstado(datos.getEstado());
+      proveedor.setProductosSuministrados(datos.getProductosSuministrados());
+      proveedor.setUsuarioAuditoria(datos.getUsuarioAuditoria());
+      proveedor.setQrCode(datos.getQrCode());
       repository.save(proveedor);
       return true;
     }).orElse(false);
   }
 
   @Transactional(readOnly = true)
-  public boolean existePorRfcprv(String rfcprv) {
-    return repository.existsByRfcprv(rfcprv);
+  public boolean existePorCorreo(String correo) {
+    return repository.existsByCorreo(correo);
   }
 
   @Transactional
-  public boolean eliminar(String clvprv) {
-    return repository.findById(clvprv).map(proveedor -> {
+  public boolean eliminar(Long idProveedor) {
+    return repository.findById(idProveedor).map(proveedor -> {
       repository.delete(proveedor);
       return true;
     }).orElse(false);

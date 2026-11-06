@@ -1,0 +1,286 @@
+{
+  "info": {
+    "name": "Cuentas por Pagar - API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('204 No Content (login OK)', () => pm.response.to.have.status(204));",
+                  "console.log('Cookies tras login:', pm.cookies.jar());"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nuevo\",\n  \"password\": \"1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","auth","logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api","clientes"] }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/clientes/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{id}}"] }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api","clientes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente Demo\",\n  \"documento\": \"12345678\",\n  \"email\": \"cliente@demo.com\",\n  \"telefono\": \"555-1234\",\n  \"direccion\": \"Calle Falsa 123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/clientes/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente Demo Actualizado\",\n  \"documento\": \"12345678\",\n  \"email\": \"nuevo@demo.com\",\n  \"telefono\": \"555-9999\",\n  \"direccion\": \"Otra dirección 456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/clientes/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","clientes","{{id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api","productos"] }
+          }
+        },
+        {
+          "name": "Buscar (query)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/productos/buscar?nombre=demo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","productos","buscar"],
+              "query": [{ "key": "nombre", "value": "demo" }]
+            }
+          }
+        },
+        {
+          "name": "Obtener por código de barras",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/productos/{{codigoBarras}}", "host": ["{{baseUrl}}"], "path": ["api","productos","{{codigoBarras}}"] }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api","productos"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoBarras\": \"7501234567890\",\n  \"nombre\": \"Producto Demo\",\n  \"precio\": 12.5,\n  \"stock\": 100\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/productos/{{codigoBarras}}", "host": ["{{baseUrl}}"], "path": ["api","productos","{{codigoBarras}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoBarras\": \"7501234567890\",\n  \"nombre\": \"Producto Demo v2\",\n  \"precio\": 15.0,\n  \"stock\": 80\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/productos/{{codigoBarras}}", "host": ["{{baseUrl}}"], "path": ["api","productos","{{codigoBarras}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Proveedores",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/proveedores", "host": ["{{baseUrl}}"], "path": ["api","proveedores"] }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/proveedores/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","proveedores","{{id}}"] }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/proveedores", "host": ["{{baseUrl}}"], "path": ["api","proveedores"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Proveedor Demo\",\n  \"ruc\": \"20123456789\",\n  \"email\": \"proveedor@demo.com\",\n  \"telefono\": \"555-0000\",\n  \"direccion\": \"Av. Proveedores 789\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/proveedores/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","proveedores","{{id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Proveedor Demo v2\",\n  \"ruc\": \"20123456789\",\n  \"email\": \"nuevo@proveedor.com\",\n  \"telefono\": \"555-1111\",\n  \"direccion\": \"Otra dirección\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/proveedores/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","proveedores","{{id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ventas",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/ventas", "host": ["{{baseUrl}}"], "path": ["api","ventas"] }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/ventas/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","ventas","{{id}}"] }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/ventas", "host": ["{{baseUrl}}"], "path": ["api","ventas"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 1,\n  \"fecha\": \"2026-10-30\",\n  \"items\": [\n    { \"productoId\": 1, \"cantidad\": 2, \"precio\": 12.5 }\n  ],\n  \"total\": 25.0\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/ventas/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","ventas","{{id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 1,\n  \"fecha\": \"2026-10-30\",\n  \"items\": [\n    { \"productoId\": 1, \"cantidad\": 3, \"precio\": 12.5 }\n  ],\n  \"total\": 37.5\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/ventas/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","ventas","{{id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Público",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/actuator/health", "host": ["{{baseUrl}}"], "path": ["actuator","health"] }
+          }
+        }
+      ]
+    }
+  ]
+}

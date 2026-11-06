@@ -27,7 +27,7 @@ public class ProveedorController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Proveedor> obtener(@PathVariable String id) {
+  public ResponseEntity<Proveedor> obtener(@PathVariable Long id) {
     return service.obtener(id)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
@@ -40,7 +40,7 @@ public class ProveedorController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Proveedor> actualizar(@PathVariable String id,
+  public ResponseEntity<Proveedor> actualizar(@PathVariable Long id,
       @Valid @RequestBody Proveedor proveedor) {
     return service.actualizar(id, proveedor)
         ? ResponseEntity.ok(service.obtener(id).orElseThrow())
@@ -48,7 +48,7 @@ public class ProveedorController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> eliminar(@PathVariable String id) {
+  public ResponseEntity<Void> eliminar(@PathVariable Long id) {
     return service.eliminar(id)
         ? ResponseEntity.noContent().build()
         : ResponseEntity.notFound().build();

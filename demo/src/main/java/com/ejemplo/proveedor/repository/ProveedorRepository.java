@@ -4,9 +4,9 @@ import com.ejemplo.proveedor.model.Proveedor;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProveedorRepository extends JpaRepository<Proveedor, String> {
+public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
 
-  Optional<Proveedor> findByRfcprv(String rfcprv);
+  Optional<Proveedor> findByCorreo(String correo);
 
-  boolean existsByRfcprv(String rfcprv);
+  boolean existsByCorreo(String correo);
 }
