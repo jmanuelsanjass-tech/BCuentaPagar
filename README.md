@@ -64,7 +64,11 @@ La API utiliza Spring Security con autenticación basada en sesión. Los usuario
 Configuración relevante:
 
 - CSRF deshabilitado.
-- CORS habilitado con acceso global (`*`).
+- CORS habilitado para `https://zapateria-erp-front.web.app` y `http://localhost:4200`,
+  con credenciales para la autenticación basada en sesión.
+- En producción, la cookie de sesión usa `SameSite=None; Secure` para que el navegador
+  pueda enviarla entre el frontend y la API. El cliente debe enviar solicitudes con
+  credenciales habilitadas.
 - Endpoints públicos:
   - `/`
   - `/actuator/health`
