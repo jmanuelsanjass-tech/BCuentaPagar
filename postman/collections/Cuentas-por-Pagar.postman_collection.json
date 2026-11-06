@@ -131,6 +131,13 @@
           }
         },
         {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/productos/id/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","productos","id","{{id}}"] }
+          }
+        },
+        {
           "name": "Crear",
           "request": {
             "method": "POST",
@@ -138,7 +145,7 @@
             "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api","productos"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"codigoBarras\": \"7501234567890\",\n  \"nombre\": \"Producto Demo\",\n  \"precio\": 12.5,\n  \"stock\": 100\n}"
+              "raw": "{\n  \"nombre\": \"Producto Demo\",\n  \"descripcion\": \"Producto para pruebas\",\n  \"categoria\": \"Abarrotes\",\n  \"precio\": 12.50,\n  \"stock\": 100,\n  \"estado\": \"activo\",\n  \"codigoBarras\": \"7501234567890\"\n}"
             }
           }
         },
@@ -150,7 +157,7 @@
             "url": { "raw": "{{baseUrl}}/api/productos/{{codigoBarras}}", "host": ["{{baseUrl}}"], "path": ["api","productos","{{codigoBarras}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"codigoBarras\": \"7501234567890\",\n  \"nombre\": \"Producto Demo v2\",\n  \"precio\": 15.0,\n  \"stock\": 80\n}"
+              "raw": "{\n  \"nombre\": \"Producto Demo v2\",\n  \"descripcion\": \"Producto actualizado para pruebas\",\n  \"categoria\": \"Abarrotes\",\n  \"precio\": 15.00,\n  \"stock\": 80,\n  \"estado\": \"activo\",\n  \"codigoBarras\": \"7501234567890\"\n}"
             }
           }
         },
@@ -188,7 +195,7 @@
             "url": { "raw": "{{baseUrl}}/api/proveedores", "host": ["{{baseUrl}}"], "path": ["api","proveedores"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Proveedor Demo\",\n  \"ruc\": \"20123456789\",\n  \"email\": \"proveedor@demo.com\",\n  \"telefono\": \"555-0000\",\n  \"direccion\": \"Av. Proveedores 789\"\n}"
+              "raw": "{\n  \"nombre\": \"Proveedor Demo\",\n  \"telefono\": \"5551234567\",\n  \"correo\": \"proveedor@demo.com\",\n  \"direccion\": \"Av. Proveedores 789\",\n  \"estadoDireccion\": \"Jalisco\",\n  \"estado\": \"activo\",\n  \"productosSuministrados\": \"Material de oficina\"\n}"
             }
           }
         },
@@ -200,7 +207,7 @@
             "url": { "raw": "{{baseUrl}}/api/proveedores/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","proveedores","{{id}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Proveedor Demo v2\",\n  \"ruc\": \"20123456789\",\n  \"email\": \"nuevo@proveedor.com\",\n  \"telefono\": \"555-1111\",\n  \"direccion\": \"Otra dirección\"\n}"
+              "raw": "{\n  \"nombre\": \"Proveedor Demo v2\",\n  \"telefono\": \"5551234568\",\n  \"correo\": \"nuevo@proveedor.com\",\n  \"direccion\": \"Otra dirección\",\n  \"estadoDireccion\": \"Jalisco\",\n  \"estado\": \"activo\",\n  \"productosSuministrados\": \"Insumos de oficina\"\n}"
             }
           }
         },
@@ -238,7 +245,7 @@
             "url": { "raw": "{{baseUrl}}/api/ventas", "host": ["{{baseUrl}}"], "path": ["api","ventas"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": 1,\n  \"fecha\": \"2026-10-30\",\n  \"items\": [\n    { \"productoId\": 1, \"cantidad\": 2, \"precio\": 12.5 }\n  ],\n  \"total\": 25.0\n}"
+              "raw": "{\n  \"clienteId\": 1,\n  \"descuento\": 0.00,\n  \"iva\": 4.00,\n  \"estado\": \"completada\",\n  \"detalles\": [\n    { \"codigoBarras\": \"7501234567890\", \"cantidad\": 2, \"precioUnitario\": 12.50 }\n  ]\n}"
             }
           }
         },
@@ -250,7 +257,7 @@
             "url": { "raw": "{{baseUrl}}/api/ventas/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","ventas","{{id}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": 1,\n  \"fecha\": \"2026-10-30\",\n  \"items\": [\n    { \"productoId\": 1, \"cantidad\": 3, \"precio\": 12.5 }\n  ],\n  \"total\": 37.5\n}"
+              "raw": "{\n  \"clienteId\": 1,\n  \"descuento\": 2.50,\n  \"iva\": 6.00,\n  \"estado\": \"completada\",\n  \"detalles\": [\n    { \"codigoBarras\": \"7501234567890\", \"cantidad\": 3, \"precioUnitario\": 12.50 }\n  ]\n}"
             }
           }
         },
@@ -259,6 +266,106 @@
           "request": {
             "method": "DELETE",
             "url": { "raw": "{{baseUrl}}/api/ventas/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","ventas","{{id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cuentas por cobrar",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar"] }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar","{{id}}"] }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 1,\n  \"ventaId\": 1,\n  \"fechaVenta\": \"2026-11-05\",\n  \"fechaVencimiento\": \"2026-12-05\",\n  \"importeOriginal\": 1500.00,\n  \"saldoPendiente\": 1500.00,\n  \"diasVencidos\": 0,\n  \"limiteCredito\": 5000.00,\n  \"estatus\": \"Pendiente\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar","{{id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 1,\n  \"ventaId\": 1,\n  \"fechaVenta\": \"2026-11-05\",\n  \"fechaVencimiento\": \"2026-12-05\",\n  \"importeOriginal\": 1500.00,\n  \"saldoPendiente\": 750.00,\n  \"diasVencidos\": 0,\n  \"limiteCredito\": 5000.00,\n  \"estatus\": \"Pendiente\",\n  \"fechaUltimoPago\": \"2026-11-20\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar","{{id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Historial de cuentas por cobrar",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar-historia", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar-historia"] }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar-historia/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar-historia","{{id}}"] }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar-historia", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar-historia"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idHistoria\": 1,\n  \"cuentaPorCobrarId\": 1,\n  \"tipoMovimiento\": \"ALTA\",\n  \"importeOriginal\": 1500.00,\n  \"saldoAnterior\": 0.00,\n  \"saldoNuevo\": 1500.00,\n  \"montoMovimiento\": 1500.00,\n  \"fechaVencimientoNueva\": \"2026-12-05\",\n  \"diasVencidos\": 0,\n  \"usuarioMovimiento\": \"admin\",\n  \"equipoMovimiento\": \"caja-01\",\n  \"observaciones\": \"Registro inicial de la cuenta\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar-historia/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar-historia","{{id}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaPorCobrarId\": 1,\n  \"tipoMovimiento\": \"ABONO\",\n  \"importeOriginal\": 1500.00,\n  \"saldoAnterior\": 1500.00,\n  \"saldoNuevo\": 750.00,\n  \"montoMovimiento\": 750.00,\n  \"fechaVencimientoAnterior\": \"2026-12-05\",\n  \"fechaVencimientoNueva\": \"2026-12-05\",\n  \"diasVencidos\": 0,\n  \"usuarioMovimiento\": \"admin\",\n  \"equipoMovimiento\": \"caja-01\",\n  \"observaciones\": \"Abono a la cuenta\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/cuentas-por-cobrar-historia/{{id}}", "host": ["{{baseUrl}}"], "path": ["api","cuentas-por-cobrar-historia","{{id}}"] }
           }
         }
       ]

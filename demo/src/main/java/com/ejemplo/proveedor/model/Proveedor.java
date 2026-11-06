@@ -20,39 +20,41 @@ import org.hibernate.annotations.Check;
     @Index(name = "idx_proveedores_correo", columnList = "correo"),
     @Index(name = "idx_proveedores_nombre", columnList = "nombre")
 })
-@Check(name = "chk_correo_prov", constraints = "correo ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'")
+@Check(name = "chk_estado_direccion_prov", constraints =
+    "estado_direccion IN ('Aguascalientes','Baja California','Baja California Sur',"
+        + "'Campeche','Coahuila','Colima','Chiapas','Chihuahua','Ciudad de México','Durango',"
+        + "'Guanajuato','Guerrero','Hidalgo','Jalisco','México','Michoacán','Morelos',"
+        + "'Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo',"
+        + "'San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala',"
+        + "'Veracruz','Yucatán','Zacatecas')")
 @Check(name = "chk_telefono_prov", constraints = "telefono ~ '^[0-9]{10}$'")
-@Check(name = "chk_estado_direccion_prov", constraints = "estado_direccion IN ('Aguascalientes','Baja California','Baja California Sur',"
-    + "'Campeche','Coahuila','Colima','Chiapas','Chihuahua','Ciudad de México',"
-    + "'Durango','Guanajuato','Guerrero','Hidalgo','Jalisco','México','Michoacán',"
-    + "'Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo',"
-    + "'San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala',"
-    + "'Veracruz','Yucatán','Zacatecas')")
+@Check(name = "chk_correo_prov", constraints =
+    "correo ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'")
 @Data
 public class Proveedor {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id_proveedor")
+  @Column(name = "id_proveedor", nullable = false)
   private Long idProveedor;
 
   @NotBlank(message = "El nombre del proveedor es obligatorio")
   @Size(max = 100)
-  @Column(nullable = false, length = 100)
+  @Column(name = "nombre", nullable = false, length = 100)
   private String nombre;
 
   @NotBlank(message = "El teléfono es obligatorio")
   @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe contener exactamente 10 dígitos")
-  @Column(nullable = false, length = 10)
+  @Column(name = "telefono", nullable = false, length = 10)
   private String telefono;
 
   @NotBlank(message = "El correo es obligatorio")
   @Pattern(regexp = "(?i)^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "El correo electrónico no tiene un formato válido")
-  @Column(nullable = false, unique = true, length = 100)
+  @Column(name = "correo", nullable = false, unique = true, length = 100)
   private String correo;
 
   @Size(max = 200)
-  @Column(length = 200)
+  @Column(name = "direccion", length = 200)
   private String direccion;
 
   @NotBlank(message = "El estado de la dirección es obligatorio")
@@ -64,21 +66,25 @@ public class Proveedor {
   @Column(name = "estado_direccion", nullable = false, length = 50)
   private String estadoDireccion;
 
-  @Column(name = "fecha_registro", insertable = false, updatable = false, columnDefinition = "date default current_date")
+  @Column(name = "fecha_registro", insertable = false, updatable = false,
+      columnDefinition = "date default current_date")
   private LocalDate fechaRegistro;
 
+  @Pattern(regexp = "activo|inactivo",
+      message = "El estado del proveedor debe ser activo o inactivo")
   @Size(max = 20)
-  @Column(length = 20, columnDefinition = "varchar(20) default 'activo'")
+  @Column(name = "estado", length = 20, columnDefinition = "varchar(20) default 'activo'")
   private String estado = "activo";
 
   @Column(name = "productos_suministrados", columnDefinition = "text")
   private String productosSuministrados;
 
-  @Column(name = "fecha_auditoria", insertable = false, updatable = false, columnDefinition = "timestamp default current_timestamp")
+  @Column(name = "fecha_auditoria", insertable = false, updatable = false,
+      columnDefinition = "timestamp default current_timestamp")
   private LocalDateTime fechaAuditoria;
 
   @Size(max = 50)
-  @Column(length = 50)
+  @Column(name = "usuario_auditoria", length = 50)
   private String usuarioAuditoria;
 
   @Column(name = "qr_code", columnDefinition = "bytea")

@@ -4,6 +4,7 @@ import com.ejemplo.proveedor.dto.VentaDetalleRequest;
 import com.ejemplo.proveedor.dto.VentaDetalleResponse;
 import com.ejemplo.proveedor.dto.VentaRequest;
 import com.ejemplo.proveedor.dto.VentaResponse;
+import com.ejemplo.proveedor.model.Cliente;
 import com.ejemplo.proveedor.model.Venta;
 import com.ejemplo.proveedor.model.VentaDetalle;
 import com.ejemplo.proveedor.repository.VentaRepository;
@@ -13,13 +14,17 @@ import java.util.List;
 import java.util.Optional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class VentaService {
 
-  private static final BigDecimal MAX_TOTAL = new BigDecimal("9999999999.99");
+  private static final BigDecimal MAX_AMOUNT = new BigDecimal("9999999999.99");
 
   private final VentaRepository repository;
 
@@ -37,7 +42,7 @@ public class VentaService {
 
   @Transactional(readOnly = true)
   public Optional<VentaResponse> obtener(Long ventaId) {
-    return repository.findWithDetailsByVentaId(ventaId).map(this::toResponse);
+    return repository.findWithDetailsByIdVenta(ventaId).map(this::toResponse);
   }
 
   @Transactional
@@ -45,7 +50,7 @@ public class VentaService {
     Venta venta = new Venta();
     aplicarRequest(venta, request);
     Venta guardada = repository.saveAndFlush(venta);
-    return cargarRespuesta(guardada.getVentaId());
+    return cargarRespuesta(guardada.getIdVenta());
   }
 
   @Transactional
@@ -69,26 +74,42 @@ public class VentaService {
     List<VentaDetalle> detalles = request.detalles().stream()
         .map(this::toDetalle)
         .toList();
-    BigDecimal total = BigDecimal.ZERO;
+    BigDecimal subtotal = BigDecimal.ZERO;
     for (VentaDetalle detalle : detalles) {
       BigDecimal importe = detalle.getCantidad()
           .multiply(detalle.getPrecioUnitario())
           .setScale(2, RoundingMode.HALF_UP);
-      total = total.add(importe);
+      subtotal = subtotal.add(importe);
     }
 
-    if (total.compareTo(MAX_TOTAL) > 0) {
-      throw new IllegalArgumentException("El total excede el máximo permitido para una venta");
+    BigDecimal descuento = request.descuento() == null
+        ? BigDecimal.ZERO
+        : request.descuento().setScale(2, RoundingMode.HALF_UP);
+    BigDecimal iva = request.iva().setScale(2, RoundingMode.HALF_UP);
+    if (descuento.compareTo(subtotal) > 0) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "El descuento no puede exceder el subtotal");
+    }
+    BigDecimal total = subtotal.subtract(descuento).add(iva).setScale(2, RoundingMode.HALF_UP);
+
+    if (subtotal.compareTo(MAX_AMOUNT) > 0
+        || descuento.compareTo(MAX_AMOUNT) > 0
+        || iva.compareTo(MAX_AMOUNT) > 0
+        || total.compareTo(MAX_AMOUNT) > 0) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Los importes exceden el máximo permitido para una venta");
     }
 
-    venta.setClienteId(request.clienteId());
+    venta.setCliente(entityManager.getReference(Cliente.class, request.clienteId()));
+    venta.setSubtotal(subtotal.setScale(2, RoundingMode.HALF_UP));
+    venta.setDescuento(descuento);
+    venta.setIva(iva);
     venta.setTotal(total);
     if (request.estado() != null) {
       venta.setEstado(request.estado());
     }
-    if (request.formaPago() != null) {
-      venta.setFormaPago(request.formaPago());
-    }
+    venta.setUsuarioAuditoria(usuarioAutenticado());
+    venta.setQrCode(request.qrCode());
     venta.reemplazarDetalles(detalles);
   }
 
@@ -102,9 +123,18 @@ public class VentaService {
 
   private VentaResponse cargarRespuesta(Long ventaId) {
     entityManager.clear();
-    return repository.findWithDetailsByVentaId(ventaId)
+    return repository.findWithDetailsByIdVenta(ventaId)
         .map(this::toResponse)
         .orElseThrow(() -> new IllegalStateException("No se pudo recargar la venta guardada"));
+  }
+
+  private String usuarioAutenticado() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()
+        || "anonymousUser".equals(authentication.getName())) {
+      return null;
+    }
+    return authentication.getName();
   }
 
   private VentaResponse toResponse(Venta venta) {
@@ -117,13 +147,17 @@ public class VentaService {
             detalle.getImporte()))
         .toList();
     return new VentaResponse(
-        venta.getVentaId(),
-        venta.getClienteId(),
+        venta.getIdVenta(),
+        venta.getCliente().getIdCliente(),
         venta.getFechaVenta(),
+        venta.getSubtotal(),
+        venta.getDescuento(),
+        venta.getIva(),
         venta.getTotal(),
         venta.getEstado(),
-        venta.getFormaPago(),
-        venta.getUsuarioRegistro(),
+        venta.getUsuarioAuditoria(),
+        venta.getFechaAuditoria(),
+        venta.getQrCode(),
         detalles);
   }
 }

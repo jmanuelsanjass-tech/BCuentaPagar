@@ -13,5 +13,5 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
   List<Venta> findAll();
 
   @EntityGraph(attributePaths = "detalles")
-  Optional<Venta> findWithDetailsByVentaId(Long ventaId);
+  Optional<Venta> findWithDetailsByIdVenta(Long idVenta);
 }

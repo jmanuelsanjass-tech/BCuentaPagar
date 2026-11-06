@@ -143,10 +143,16 @@ Asegúrate de definir las variables de entorno necesarias antes de iniciar la ap
 
 - `GET /api/productos`
 - `GET /api/productos/buscar?nombre={valor}`
+- `GET /api/productos/categoria?categoria={Abarrotes|Lácteos|Frutería}`
+- `GET /api/productos/id/{id}`
 - `GET /api/productos/{codigoBarras}`
 - `POST /api/productos`
+- `PUT /api/productos/id/{id}`
 - `PUT /api/productos/{codigoBarras}`
+- `DELETE /api/productos/id/{id}`
 - `DELETE /api/productos/{codigoBarras}`
+
+Los productos se persisten en `inventario`. El código de barras es único; las categorías permitidas son `Abarrotes`, `Lácteos` y `Frutería`. Si se omiten, categoría, stock y estado toman por defecto `Abarrotes`, `0` y `activo`. El precio debe ser mayor que cero y el stock no puede ser negativo.
 
 ### Proveedores
 
@@ -164,6 +170,28 @@ Asegúrate de definir las variables de entorno necesarias antes de iniciar la ap
 - `PUT /api/ventas/{id}`
 - `DELETE /api/ventas/{id}`
 
+En las operaciones de creación y actualización, el subtotal se calcula a partir de los detalles; el descuento es opcional (por defecto `0`) y el IVA es obligatorio. El total se calcula como `subtotal - descuento + iva`. La venta requiere un cliente existente.
+
+### Cuentas por cobrar
+
+- `GET /api/cuentas-por-cobrar`
+- `GET /api/cuentas-por-cobrar/{id}`
+- `POST /api/cuentas-por-cobrar`
+- `PUT /api/cuentas-por-cobrar/{id}`
+- `DELETE /api/cuentas-por-cobrar/{id}`
+
+Cada cuenta requiere un cliente y una venta existentes; la venta debe pertenecer al cliente indicado. Importe, saldo, días vencidos y límite de crédito toman `0` por defecto. Los estatus admitidos son `Pendiente`, `Pagado` y `Cancelado`.
+
+### Historial de cuentas por cobrar
+
+- `GET /api/cuentas-por-cobrar-historia`
+- `GET /api/cuentas-por-cobrar-historia/{id}`
+- `POST /api/cuentas-por-cobrar-historia`
+- `PUT /api/cuentas-por-cobrar-historia/{id}`
+- `DELETE /api/cuentas-por-cobrar-historia/{id}`
+
+El alta requiere `idHistoria`, ya que la tabla no define una secuencia ni un valor predeterminado para esa clave. Cada movimiento debe referenciar una cuenta por cobrar existente. Los tipos admitidos son `ALTA`, `ABONO`, `Cancelado`, `PAGO_TOTAL`, `REESTRUCTURA`, `PRORROGA`, `CANCELACION`, `CASTIGO`, `BLOQUEO_CREDITO` y `DESBLOQUEO_CREDITO`. La eliminación de una cuenta con movimientos históricos está restringida por la llave foránea.
+
 ### Salud del sistema
 
 - `GET /`
@@ -175,7 +203,7 @@ La colección oficial de pruebas de la API se encuentra en:
 
 - `postman/collections/Cuentas-por-Pagar.postman_collection.json`
 
-Incluye ejemplos para autenticación, clientes, productos, proveedores y ventas.
+Incluye ejemplos para autenticación, clientes, productos, proveedores, ventas y cuentas por cobrar con su historial.
 
 ## Observaciones técnicas relevantes
 

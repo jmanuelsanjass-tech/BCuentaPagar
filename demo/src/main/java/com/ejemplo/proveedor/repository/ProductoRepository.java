@@ -3,19 +3,15 @@ package com.ejemplo.proveedor.repository;
 import com.ejemplo.proveedor.model.Producto;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProductoRepository extends JpaRepository<Producto, String> {
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
-  @Override
-  @EntityGraph(attributePaths = "inventario")
-  List<Producto> findAll();
+  Optional<Producto> findByCodigoBarras(String codigoBarras);
 
-  @Override
-  @EntityGraph(attributePaths = "inventario")
-  Optional<Producto> findById(String codigoBarras);
-
-  @EntityGraph(attributePaths = "inventario")
   List<Producto> findByNombreContainingIgnoreCase(String nombre);
+
+  List<Producto> findByCategoriaIgnoreCase(String categoria);
+
+  boolean existsByCodigoBarras(String codigoBarras);
 }

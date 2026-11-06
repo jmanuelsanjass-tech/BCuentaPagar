@@ -33,15 +33,31 @@ public class ProductoController {
 
   @GetMapping("/buscar")
   public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam String nombre) {
-    if (nombre.isBlank() || nombre.length() > 255) {
+    if (nombre.isBlank() || nombre.length() > 100) {
       return ResponseEntity.badRequest().build();
     }
     return ResponseEntity.ok(service.buscarPorNombre(nombre));
   }
 
+  @GetMapping("/categoria")
+  public ResponseEntity<List<Producto>> buscarPorCategoria(@RequestParam String categoria) {
+    if (categoria.isBlank()
+        || !List.of("Abarrotes", "Lácteos", "Frutería").contains(categoria.trim())) {
+      return ResponseEntity.badRequest().build();
+    }
+    return ResponseEntity.ok(service.buscarPorCategoria(categoria));
+  }
+
+  @GetMapping("/id/{idProducto}")
+  public ResponseEntity<Producto> obtenerPorId(@PathVariable Long idProducto) {
+    return service.obtener(idProducto)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
+
   @GetMapping("/{codigoBarras}")
-  public ResponseEntity<Producto> obtener(@PathVariable String codigoBarras) {
-    return service.obtener(codigoBarras)
+  public ResponseEntity<Producto> obtenerPorCodigoBarras(@PathVariable String codigoBarras) {
+    return service.obtenerPorCodigoBarras(codigoBarras)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
   }
@@ -51,17 +67,32 @@ public class ProductoController {
     return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(producto));
   }
 
-  @PutMapping("/{codigoBarras}")
-  public ResponseEntity<Producto> actualizar(
-      @PathVariable String codigoBarras, @Valid @RequestBody Producto producto) {
-    return service.actualizar(codigoBarras, producto)
+  @PutMapping("/id/{idProducto}")
+  public ResponseEntity<Producto> actualizarPorId(
+      @PathVariable Long idProducto, @Valid @RequestBody Producto producto) {
+    return service.actualizar(idProducto, producto)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
   }
 
+  @PutMapping("/{codigoBarras}")
+  public ResponseEntity<Producto> actualizarPorCodigoBarras(
+      @PathVariable String codigoBarras, @Valid @RequestBody Producto producto) {
+    return service.actualizarPorCodigoBarras(codigoBarras, producto)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
+
+  @DeleteMapping("/id/{idProducto}")
+  public ResponseEntity<Void> eliminarPorId(@PathVariable Long idProducto) {
+    return service.eliminar(idProducto)
+        ? ResponseEntity.noContent().build()
+        : ResponseEntity.notFound().build();
+  }
+
   @DeleteMapping("/{codigoBarras}")
-  public ResponseEntity<Void> eliminar(@PathVariable String codigoBarras) {
-    return service.eliminar(codigoBarras)
+  public ResponseEntity<Void> eliminarPorCodigoBarras(@PathVariable String codigoBarras) {
+    return service.eliminarPorCodigoBarras(codigoBarras)
         ? ResponseEntity.noContent().build()
         : ResponseEntity.notFound().build();
   }

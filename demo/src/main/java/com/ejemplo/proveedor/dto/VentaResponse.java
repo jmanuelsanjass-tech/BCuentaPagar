@@ -8,9 +8,13 @@ public record VentaResponse(
     Long ventaId,
     Long clienteId,
     LocalDateTime fechaVenta,
+    BigDecimal subtotal,
+    BigDecimal descuento,
+    BigDecimal iva,
     BigDecimal total,
     String estado,
-    String formaPago,
-    String usuarioRegistro,
+    String usuarioAuditoria,
+    LocalDateTime fechaAuditoria,
+    byte[] qrCode,
     List<VentaDetalleResponse> detalles) {
 }
