@@ -79,15 +79,7 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorize -> authorize
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-            .requestMatchers("/").permitAll()
-            .requestMatchers("/actuator/health").permitAll()
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers(
-                "/api/proveedores/**",
-                "/api/clientes/**",
-                "/api/cuentas-por-cobrar/**",
-                "/api/cuentas-por-cobrar-historia/**").permitAll()
-            .anyRequest().authenticated())
+            .anyRequest().permitAll())
         .formLogin(form -> form.disable());
 
     return http.build();
