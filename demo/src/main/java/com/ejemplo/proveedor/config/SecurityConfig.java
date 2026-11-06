@@ -82,6 +82,11 @@ public class SecurityConfig {
             .requestMatchers("/").permitAll()
             .requestMatchers("/actuator/health").permitAll()
             .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers(
+                "/api/proveedores/**",
+                "/api/clientes/**",
+                "/api/cuentas-por-cobrar/**",
+                "/api/cuentas-por-cobrar-historia/**").permitAll()
             .anyRequest().authenticated())
         .formLogin(form -> form.disable());
 

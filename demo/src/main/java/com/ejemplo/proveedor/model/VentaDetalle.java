@@ -29,13 +29,11 @@ public class VentaDetalle {
   private Long detalleId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "id_venta", nullable = false,
-      foreignKey = @ForeignKey(name = "fk_venta"))
+  @JoinColumn(name = "id_venta", nullable = false, foreignKey = @ForeignKey(name = "fk_venta"))
   private Venta venta;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "id_producto", nullable = false,
-      foreignKey = @ForeignKey(name = "fk_producto"))
+  @JoinColumn(name = "id_producto", nullable = false, foreignKey = @ForeignKey(name = "fk_producto"))
   private Producto producto;
 
   @Column(name = "cantidad", nullable = false)
@@ -48,8 +46,7 @@ public class VentaDetalle {
   @Column(name = "subtotal", precision = 12, scale = 2, insertable = false, updatable = false)
   private BigDecimal subtotal;
 
-  @Column(name = "descuento", precision = 12, scale = 2,
-      columnDefinition = "numeric(12,2) default 0.00")
+  @Column(name = "descuento", precision = 12, scale = 2, columnDefinition = "numeric(12,2) default 0.00")
   private BigDecimal descuento = BigDecimal.ZERO;
 
   @Column(name = "iva", precision = 12, scale = 2, insertable = false, updatable = false)
@@ -62,7 +59,6 @@ public class VentaDetalle {
   @Column(name = "usuario_auditoria", length = 50)
   private String usuarioAuditoria;
 
-  @Column(name = "fecha_auditoria", insertable = false, updatable = false,
-      columnDefinition = "timestamp default current_timestamp")
+  @Column(name = "fecha_auditoria", insertable = false, updatable = false, columnDefinition = "timestamp default current_timestamp")
   private LocalDateTime fechaAuditoria;
 }
