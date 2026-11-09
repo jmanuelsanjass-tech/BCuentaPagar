@@ -27,7 +27,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         .password(usuario.getPassword())
         .disabled(!usuario.isEnabled())
         .authorities(usuario.getRoles().stream()
-            .map(rol -> new SimpleGrantedAuthority(rol.getNombre()))
+            .map(rol -> rol.getNombre().startsWith("ROLE_")
+                ? rol.getNombre()
+                : "ROLE_" + rol.getNombre())
+            .map(SimpleGrantedAuthority::new)
             .toList())
         .build();
   }

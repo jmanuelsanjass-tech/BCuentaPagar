@@ -79,7 +79,21 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorize -> authorize
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-            .anyRequest().permitAll())
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+            .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "VENTAS")
+            .requestMatchers("/api/clientes/**").hasAnyRole("ADMIN", "VENTAS")
+            .requestMatchers("/api/inventarios/**", "/api/productos/**")
+                .hasAnyRole("ADMIN", "INVENTARIOS")
+            .requestMatchers("/api/proveedores/**").hasAnyRole("ADMIN", "INVENTARIOS")
+            .requestMatchers(
+                "/api/cuentas-por-cobrar/**",
+                "/api/cuentas-por-cobrar-historia/**")
+                .hasAnyRole("ADMIN", "VENTAS", "CONTABILIDAD")
+            .requestMatchers("/api/cuentas-por-pagar/**")
+                .hasAnyRole("ADMIN", "CONTABILIDAD")
+            .requestMatchers("/api/reportes/**").hasAnyRole("ADMIN", "CONTABILIDAD")
+            .anyRequest().authenticated())
         .formLogin(form -> form.disable());
 
     return http.build();
