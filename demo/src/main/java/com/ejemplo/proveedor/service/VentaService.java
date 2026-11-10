@@ -75,9 +75,9 @@ public class VentaService {
     List<VentaDetalle> detalles = request.detalles().stream()
         .map(this::toDetalle)
         .toList();
-    BigDecimal subtotal = BigDecimal.ZERO;
-    BigDecimal descuentoDetalles = BigDecimal.ZERO;
-    BigDecimal iva = BigDecimal.ZERO;
+    BigDecimal subtotal = BigDecimal.ZERO.setScale(2);
+    BigDecimal descuentoDetalles = BigDecimal.ZERO.setScale(2);
+    BigDecimal iva = BigDecimal.ZERO.setScale(2);
     for (VentaDetalle detalle : detalles) {
       BigDecimal importe = BigDecimal.valueOf(detalle.getCantidad())
           .multiply(detalle.getPrecioUnitario())
@@ -94,7 +94,7 @@ public class VentaService {
     }
 
     BigDecimal descuentoVenta = request.descuento() == null
-        ? BigDecimal.ZERO
+        ? BigDecimal.ZERO.setScale(2)
         : request.descuento().setScale(2, RoundingMode.HALF_UP);
     BigDecimal descuento = descuentoVenta.add(descuentoDetalles).setScale(2, RoundingMode.HALF_UP);
     iva = iva.setScale(2, RoundingMode.HALF_UP);
@@ -131,7 +131,7 @@ public class VentaService {
     detalle.setCantidad(request.cantidad());
     detalle.setPrecioUnitario(request.precioUnitario());
     detalle.setDescuento(request.descuento() == null
-        ? BigDecimal.ZERO
+        ? BigDecimal.ZERO.setScale(2)
         : request.descuento().setScale(2, RoundingMode.HALF_UP));
     detalle.setUsuarioAuditoria(usuarioAutenticado());
     return detalle;

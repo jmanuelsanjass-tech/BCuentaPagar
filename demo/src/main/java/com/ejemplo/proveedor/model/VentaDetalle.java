@@ -47,7 +47,7 @@ public class VentaDetalle {
   private BigDecimal subtotal;
 
   @Column(name = "descuento", precision = 12, scale = 2, columnDefinition = "numeric(12,2) default 0.00")
-  private BigDecimal descuento = BigDecimal.ZERO;
+  private BigDecimal descuento = BigDecimal.ZERO.setScale(2);
 
   @Column(name = "iva", precision = 12, scale = 2, insertable = false, updatable = false)
   private BigDecimal iva;

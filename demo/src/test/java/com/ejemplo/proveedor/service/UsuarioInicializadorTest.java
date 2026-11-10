@@ -2,6 +2,7 @@ package com.ejemplo.proveedor.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -13,6 +14,19 @@ import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 class UsuarioInicializadorTest {
+
+  @Test
+  void skipsInitializationWhenCredentialsAreMissing() {
+    UsuarioRepository usuarioRepository = org.mockito.Mockito.mock(UsuarioRepository.class);
+    RolRepository rolRepository = org.mockito.Mockito.mock(RolRepository.class);
+    PasswordEncoder passwordEncoder = org.mockito.Mockito.mock(PasswordEncoder.class);
+
+    UsuarioInicializador inicializador =
+        new UsuarioInicializador(usuarioRepository, rolRepository, passwordEncoder, "", "");
+    inicializador.run(new DefaultApplicationArguments());
+
+    verifyNoInteractions(usuarioRepository, rolRepository, passwordEncoder);
+  }
 
   @Test
   void updatesPasswordForAnExistingConfiguredUser() {

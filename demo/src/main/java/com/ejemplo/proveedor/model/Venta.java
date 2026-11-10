@@ -32,20 +32,17 @@ public class Venta {
   private Long idVenta;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "id_cliente", nullable = false,
-      foreignKey = @ForeignKey(name = "fk_cliente"))
+  @JoinColumn(name = "id_cliente", nullable = false, foreignKey = @ForeignKey(name = "fk_cliente"))
   private Cliente cliente;
 
-  @Column(name = "fecha_venta", insertable = false, updatable = false,
-      columnDefinition = "timestamp default current_timestamp")
+  @Column(name = "fecha_venta", insertable = false, updatable = false, columnDefinition = "timestamp default current_timestamp")
   private LocalDateTime fechaVenta;
 
   @Column(name = "subtotal", nullable = false, precision = 12, scale = 2)
   private BigDecimal subtotal;
 
-  @Column(name = "descuento", precision = 12, scale = 2,
-      columnDefinition = "numeric(12,2) default 0.00")
-  private BigDecimal descuento = BigDecimal.ZERO;
+  @Column(name = "descuento", precision = 12, scale = 2, columnDefinition = "numeric(12,2) default 0.00")
+  private BigDecimal descuento = BigDecimal.ZERO.setScale(2);
 
   @Column(name = "iva", nullable = false, precision = 12, scale = 2)
   private BigDecimal iva;
@@ -60,8 +57,7 @@ public class Venta {
   @Column(name = "usuario_auditoria", length = 50)
   private String usuarioAuditoria;
 
-  @Column(name = "fecha_auditoria", insertable = false, updatable = false,
-      columnDefinition = "timestamp default current_timestamp")
+  @Column(name = "fecha_auditoria", insertable = false, updatable = false, columnDefinition = "timestamp default current_timestamp")
   private LocalDateTime fechaAuditoria;
 
   @Column(name = "qr_code", columnDefinition = "bytea")

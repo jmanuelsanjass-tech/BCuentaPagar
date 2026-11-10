@@ -5,7 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(scanBasePackages = {"com.example.demo", "com.ejemplo.proveedor"})
+@SpringBootApplication(scanBasePackages = {
+    "com.example.demo",
+    "com.ejemplo.proveedor"
+})
 @EntityScan(basePackages = "com.ejemplo.proveedor.model")
 @EnableJpaRepositories(basePackages = "com.ejemplo.proveedor.repository")
 public class DemoApplication {
@@ -13,5 +16,4 @@ public class DemoApplication {
   public static void main(String[] args) {
     SpringApplication.run(DemoApplication.class, args);
   }
-
 }

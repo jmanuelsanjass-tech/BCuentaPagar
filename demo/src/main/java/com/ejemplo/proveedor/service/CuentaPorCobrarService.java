@@ -92,7 +92,7 @@ public class CuentaPorCobrarService {
   }
 
   private BigDecimal defaultAmount(BigDecimal amount) {
-    return amount == null ? BigDecimal.ZERO : amount;
+    return amount == null ? BigDecimal.ZERO.setScale(2) : amount;
   }
 
   private CuentaPorCobrarResponse toResponse(CuentaPorCobrar cuenta) {

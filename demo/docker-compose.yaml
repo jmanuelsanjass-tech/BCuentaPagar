@@ -3,55 +3,25 @@ services:
     build:
       context: ..
       dockerfile: demo/Dockerfile
+
     container_name: backend-cuentapagar
+
     ports:
       - "8080:8080"
+
     env_file:
       - .env
+
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DB_URL: jdbc:postgresql://db:5432/Tienda
+
+      DB_URL: jdbc:postgresql://host.docker.internal:5432/Tienda
       DB_USER: postgres
-      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD in demo/.env}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD in demo/.env}
-      APP_SECURITY_USERNAME: ${APP_SECURITY_USERNAME:?Define APP_SECURITY_USERNAME in demo/.env}
-      APP_SECURITY_PASSWORD: ${APP_SECURITY_PASSWORD:?Define APP_SECURITY_PASSWORD in demo/.env}
-    depends_on:
-      db-init:
-        condition: service_completed_successfully
+      DB_PASSWORD: ${DB_PASSWORD}
 
-  db-init:
-    image: postgres:15
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      PGPASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD in demo/.env}
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        if [ "$$(psql -h db -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = 'Tienda'")" != "1" ]; then
-          createdb -h db -U postgres -O postgres "Tienda"
-        fi
-    restart: "no"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/Tienda
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-  db:
-    image: postgres:15
-    container_name: postgres-cuentapagar
-    restart: always
-    environment:
-      POSTGRES_DB: Tienda
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD in demo/.env}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-volumes:
-  postgres_data:
+      APP_SECURITY_USERNAME: ${APP_SECURITY_USERNAME}
+      APP_SECURITY_PASSWORD: ${APP_SECURITY_PASSWORD}

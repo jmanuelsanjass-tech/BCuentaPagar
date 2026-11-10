@@ -37,8 +37,7 @@ public class UsuarioInicializador implements ApplicationRunner {
   @Transactional
   public void run(ApplicationArguments args) {
     if (username.isBlank() || password.isBlank()) {
-      throw new IllegalStateException(
-          "Define APP_SECURITY_USERNAME y APP_SECURITY_PASSWORD en demo/.env para crear el usuario inicial.");
+      return;
     }
 
     Usuario existente = usuarioRepository.findByUsername(username).orElse(null);

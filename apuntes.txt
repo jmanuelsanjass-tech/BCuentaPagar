@@ -1,0 +1,47 @@
+Te recomendaría dejar estos comandos documentados:
+
+Shell
+# Reconstruir backend
+mvn clean package -DskipTests
+ 
+# Reconstruir imagen
+docker compose build
+ 
+# Levantar
+docker compose up -d
+ 
+# Ver logs
+docker logs -f backend-cuentapagar
+ 
+# Estado
+docker ps
+ 
+# Detener
+docker compose down
+
+Y verificar algunos puntos antes de continuar con nuevas funcionalidades:
+
+Salud de la aplicación
+Shell
+curl http://localhost:8080/actuator/health
+ 
+
+(si tienes Actuator configurado).
+
+Persistencia
+
+Reinicia el contenedor:
+
+Shell
+docker restart backend-cuentapagar
+
+y valida que los datos siguen estando en PostgreSQL local.
+
+Variables sensibles
+
+Asegúrate de que .env esté en .gitignore:
+
+.ignore
+.env
+
+para no subir credenciales al repositorio.
