@@ -13,21 +13,23 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
-import com.ejemplo.proveedor.service.CustomUserDetailsService;
+import com.ejemplo.proveedor.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-  private final CustomUserDetailsService userDetailsService;
+  private final UserDetailsServiceImpl userDetailsService;
 
-  public SecurityConfig(CustomUserDetailsService userDetailsService) {
+  public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
     this.userDetailsService = userDetailsService;
   }
 
@@ -60,7 +62,7 @@ public class SecurityConfig {
         "https://zapateria-erp-front.web.app",
         "http://localhost:4200"));
     configuration.setAllowCredentials(true);
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
@@ -75,12 +77,17 @@ public class SecurityConfig {
     http.authenticationProvider(authenticationProvider)
         .securityContext(securityContext ->
             securityContext.securityContextRepository(securityContextRepository))
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
         .cors(Customizer.withDefaults())
-        .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorize -> authorize
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
             .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
             .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+            .requestMatchers("/api/bitacora/**").hasRole("ADMIN")
+            .requestMatchers("/api/roles/**").hasRole("ADMIN")
             .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "VENTAS")
             .requestMatchers("/api/clientes/**").hasAnyRole("ADMIN", "VENTAS")
             .requestMatchers("/api/inventarios/**", "/api/productos/**")

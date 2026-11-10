@@ -77,6 +77,27 @@ Configuración relevante:
 
 El usuario inicial se crea al arrancar la aplicación si existen las variables `APP_SECURITY_USERNAME` y `APP_SECURITY_PASSWORD` en el archivo `.env` de `demo/`.
 
+### CRUD de usuarios y roles
+
+Las rutas `/api/usuarios/**` y `/api/roles/**` requieren el rol `ADMIN`.
+
+Usuarios:
+
+- `GET /api/usuarios` y `GET /api/usuarios/{id}`
+- `POST /api/usuarios` para crear; acepta `username`, `password`, `activo` y `roles` (IDs de rol).
+- `PUT /api/usuarios/{id}` para actualizar; acepta `username`, `password` opcional, `activo` y `roles` opcional.
+- `DELETE /api/usuarios/{id}`
+
+Roles:
+
+- `GET /api/roles` y `GET /api/roles/{id}`
+- `POST /api/roles` y `PUT /api/roles/{id}`; aceptan `nombre` y `descripcion`.
+- `DELETE /api/roles/{id}`; devuelve conflicto si el rol está asignado a usuarios.
+
+Las respuestas de usuario no incluyen la contraseña. Las contraseñas recibidas por el CRUD se almacenan cifradas con BCrypt.
+
+Si la base de datos ya existía con las columnas `usuarios.enabled` y `roles.id`, ejecuta una vez `demo/src/main/resources/db/manual/migrate_usuarios_roles.sql` sobre la base `Tienda` antes de iniciar la nueva versión. Esta migración conserva los IDs y la relación `usuarios_roles`.
+
 ## Base de datos
 
 El proyecto está configurado para usar PostgreSQL con la siguiente base por defecto:

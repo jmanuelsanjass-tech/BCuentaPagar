@@ -1,5 +1,6 @@
 package com.ejemplo.proveedor.model;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import jakarta.persistence.Column;
@@ -34,8 +35,12 @@ public class Usuario {
   @Column(name = "password", nullable = false, length = 255)
   private String password;
 
-  @Column(name = "enabled", nullable = false)
-  private boolean enabled = true;
+  @Column(name = "activo", columnDefinition = "boolean default true")
+  private boolean activo = true;
+
+  @Column(name = "fecha_alta", insertable = false, updatable = false,
+      columnDefinition = "timestamp default current_timestamp")
+  private LocalDateTime fechaAlta;
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(

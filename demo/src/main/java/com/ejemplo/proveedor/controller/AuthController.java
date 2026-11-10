@@ -1,8 +1,10 @@
 package com.ejemplo.proveedor.controller;
 
 import java.util.Locale;
+import java.util.List;
 import java.util.Set;
 import com.ejemplo.proveedor.dto.LoginRequest;
+import com.ejemplo.proveedor.dto.LoginResponse;
 import com.ejemplo.proveedor.dto.RegistroRequest;
 import com.ejemplo.proveedor.model.Rol;
 import com.ejemplo.proveedor.model.Usuario;
@@ -15,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -23,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,8 +54,13 @@ public class AuthController {
     this.securityContextRepository = securityContextRepository;
   }
 
+  @GetMapping("/csrf")
+  public CsrfToken csrfToken(CsrfToken csrfToken) {
+    return csrfToken;
+  }
+
   @PostMapping("/login")
-  public ResponseEntity<Void> login(
+  public ResponseEntity<LoginResponse> login(
       @Valid @RequestBody LoginRequest request,
       HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) {
@@ -68,7 +77,13 @@ public class AuthController {
       context.setAuthentication(authentication);
       SecurityContextHolder.setContext(context);
       securityContextRepository.saveContext(context, httpRequest, httpResponse);
-      return ResponseEntity.noContent().build();
+      Usuario usuario = usuarioRepository.findByUsername(authentication.getName())
+          .orElseThrow();
+      List<String> roles = usuario.getRoles().stream()
+          .map(Rol::getNombre)
+          .sorted()
+          .toList();
+      return ResponseEntity.ok(new LoginResponse(authentication.getName(), roles));
     } catch (AuthenticationException exception) {
       SecurityContextHolder.clearContext();
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -104,7 +119,7 @@ public class AuthController {
     Usuario usuario = new Usuario();
     usuario.setUsername(username);
     usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-    usuario.setEnabled(true);
+    usuario.setActivo(true);
     usuario.setRoles(Set.of(rol));
     usuarioRepository.save(usuario);
 

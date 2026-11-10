@@ -59,7 +59,7 @@ public class UsuarioInicializador implements ApplicationRunner {
     Usuario usuario = new Usuario();
     usuario.setUsername(username);
     usuario.setPassword(passwordEncoder.encode(password));
-    usuario.setEnabled(true);
+    usuario.setActivo(true);
     usuario.getRoles().add(rol);
     usuarioRepository.save(usuario);
   }
