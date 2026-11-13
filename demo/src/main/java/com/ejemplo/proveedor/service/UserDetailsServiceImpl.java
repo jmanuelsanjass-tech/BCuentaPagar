@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ejemplo.proveedor.security.SecurityRoles;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -33,7 +34,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         .forEach(r -> System.out.println("ROL: " + r.getNombre()));
 
     List<GrantedAuthority> authorities = usuario.getRoles().stream()
-        .<GrantedAuthority>map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNombre()))
+        .<GrantedAuthority>map(rol ->
+            new SimpleGrantedAuthority(SecurityRoles.authority(rol.getNombre())))
         .collect(Collectors.toList());
 
     return new User(

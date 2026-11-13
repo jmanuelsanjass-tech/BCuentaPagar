@@ -8,6 +8,7 @@ import com.ejemplo.proveedor.model.Rol;
 import com.ejemplo.proveedor.model.Usuario;
 import com.ejemplo.proveedor.repository.RolRepository;
 import com.ejemplo.proveedor.repository.UsuarioRepository;
+import com.ejemplo.proveedor.security.SecurityRoles;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.HashSet;
@@ -213,7 +214,6 @@ public class UsuarioService {
   }
 
   private boolean esRolAdministrador(Rol rol) {
-    String nombre = rol.getNombre().trim().toUpperCase(java.util.Locale.ROOT);
-    return "ADMIN".equals(nombre) || "ROLE_ADMIN".equals(nombre);
+    return "ADMIN".equals(SecurityRoles.normalizeName(rol.getNombre()));
   }
 }

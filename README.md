@@ -75,7 +75,7 @@ Configuración relevante:
   - `/api/auth/**`
 - El resto de endpoints requiere autenticación.
 
-El usuario inicial se crea al arrancar la aplicación si existen las variables `APP_SECURITY_USERNAME` y `APP_SECURITY_PASSWORD` en el archivo `.env` de `demo/`.
+El usuario inicial se crea con el rol `ADMIN` al arrancar la aplicación si existen las variables `APP_SECURITY_USERNAME` y `APP_SECURITY_PASSWORD` en el archivo `.env` de `demo/`. Si ese usuario ya existe, se conserva su contraseña cuando coincide con la variable y se le agrega el rol `ADMIN` si aún no lo tiene.
 
 ### CRUD de usuarios y roles
 

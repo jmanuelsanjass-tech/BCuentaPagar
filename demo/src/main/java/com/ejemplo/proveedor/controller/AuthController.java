@@ -10,6 +10,7 @@ import com.ejemplo.proveedor.model.Rol;
 import com.ejemplo.proveedor.model.Usuario;
 import com.ejemplo.proveedor.repository.RolRepository;
 import com.ejemplo.proveedor.repository.UsuarioRepository;
+import com.ejemplo.proveedor.security.SecurityRoles;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -80,7 +81,8 @@ public class AuthController {
       Usuario usuario = usuarioRepository.findByUsername(authentication.getName())
           .orElseThrow();
       List<String> roles = usuario.getRoles().stream()
-          .map(Rol::getNombre)
+          .map(rol -> SecurityRoles.normalizeName(rol.getNombre()))
+          .distinct()
           .sorted()
           .toList();
       return ResponseEntity.ok(new LoginResponse(authentication.getName(), roles));

@@ -40,26 +40,35 @@ public class UsuarioInicializador implements ApplicationRunner {
       return;
     }
 
+    Rol rolAdministrador = rolRepository.findByNombre("ADMIN")
+        .or(() -> rolRepository.findByNombre("ROLE_ADMIN"))
+        .orElseGet(() -> {
+          Rol nuevoRol = new Rol();
+          nuevoRol.setNombre("ADMIN");
+          return rolRepository.save(nuevoRol);
+        });
+
     Usuario existente = usuarioRepository.findByUsername(username).orElse(null);
     if (existente != null) {
+      boolean actualizado = false;
       if (!passwordEncoder.matches(password, existente.getPassword())) {
         existente.setPassword(passwordEncoder.encode(password));
+        actualizado = true;
+      }
+      if (existente.getRoles().add(rolAdministrador)) {
+        actualizado = true;
+      }
+      if (actualizado) {
         usuarioRepository.save(existente);
       }
       return;
     }
 
-    Rol rol = rolRepository.findByNombre("USER").orElseGet(() -> {
-      Rol nuevoRol = new Rol();
-      nuevoRol.setNombre("USER");
-      return rolRepository.save(nuevoRol);
-    });
-
     Usuario usuario = new Usuario();
     usuario.setUsername(username);
     usuario.setPassword(passwordEncoder.encode(password));
     usuario.setActivo(true);
-    usuario.getRoles().add(rol);
+    usuario.getRoles().add(rolAdministrador);
     usuarioRepository.save(usuario);
   }
 }

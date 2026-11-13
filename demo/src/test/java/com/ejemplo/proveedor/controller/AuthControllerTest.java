@@ -47,7 +47,7 @@ class AuthControllerTest {
     Rol ventas = new Rol();
     ventas.setNombre("VENTAS");
     Rol admin = new Rol();
-    admin.setNombre("ADMIN");
+    admin.setNombre("ROLE_ADMIN");
     Usuario usuario = new Usuario();
     usuario.setUsername("melissa");
     usuario.setRoles(java.util.Set.of(ventas, admin));
