@@ -98,6 +98,46 @@ Las respuestas de usuario no incluyen la contraseña. Las contraseñas recibidas
 
 Si la base de datos ya existía con las columnas `usuarios.enabled` y `roles.id`, ejecuta una vez `demo/src/main/resources/db/manual/migrate_usuarios_roles.sql` sobre la base `Tienda` antes de iniciar la nueva versión. Esta migración conserva los IDs y la relación `usuarios_roles`.
 
+### CRUD de órdenes de compra
+
+Las rutas `/api/ordenes-compra/**` requieren el rol `ADMIN` o `INVENTARIOS`.
+
+- `GET /api/ordenes-compra` y `GET /api/ordenes-compra/{id}` para consultar.
+- `POST /api/ordenes-compra` para crear.
+- `PUT /api/ordenes-compra/{id}` para actualizar.
+- `DELETE /api/ordenes-compra/{id}` para eliminar.
+
+El cuerpo de creación y actualización acepta `empresaId`, `numeroOc`, `proveedorId`, `fechaOrden`, `estado`, `moneda`, `montoTotal`, `solicitadoPor`, `aprobadoPor` y `aprobadoEn`. `estado` puede ser `BORRADOR`, `APROBADA`, `CERRADA` o `CANCELADA`; si se omite, usa `BORRADOR`. `montoTotal` puede omitirse y usa `0`. El número de orden debe ser único por empresa y quien solicita no puede ser quien aprueba. `idOrdenCompra` se genera con `uuidv7()` y `creadoEn` con el valor por defecto de la base de datos.
+
+Las líneas se administran dentro de la orden:
+
+- `GET /api/ordenes-compra/{ordenCompraId}/lineas` y `GET /api/ordenes-compra/{ordenCompraId}/lineas/{id}`.
+- `POST /api/ordenes-compra/{ordenCompraId}/lineas`, `PUT /api/ordenes-compra/{ordenCompraId}/lineas/{id}` y `DELETE /api/ordenes-compra/{ordenCompraId}/lineas/{id}`.
+
+El cuerpo de línea acepta `numeroLinea`, `descripcion`, `cantidadOrdenada`, `precioUnitario`, `cantidadRecibida` y `cuentaContableId`. La cantidad ordenada debe ser mayor que cero; los importes y cantidades no pueden ser negativos. El número de línea debe ser único dentro de la orden. `cantidadRecibida` se inicializa en cero si se omite. Al crear, actualizar o eliminar una línea, el servicio recalcula `montoTotal` como la suma de cantidad ordenada por precio unitario. Las operaciones de línea también verifican que existan la orden y la cuenta contable referenciadas.
+
+### Recepciones, facturas de proveedor, pagos y políticas
+
+Permisos:
+
+- `/api/recepciones-mercancia/**`: `ADMIN` o `INVENTARIOS`.
+- `/api/facturas-proveedor/**` y `/api/pagos/**`: `ADMIN` o `CONTABILIDAD`.
+- `/api/politicas-aprobacion/**` y `/api/bitacora-auditoria/**`: `ADMIN`.
+
+Los cuatro recursos admiten `GET` colección, `GET /{id}`, `POST`, `PUT /{id}` y `DELETE /{id}`. Las líneas de factura se administran bajo `/api/facturas-proveedor/{facturaId}/lineas` con las mismas operaciones CRUD.
+
+Recepciones: `/api/recepciones-mercancia`. El cuerpo requiere `empresaId`, `numeroRecepcion`, `ordenCompraId`, `fechaRecepcion` y `recibidoPor`. El número es único por empresa y la orden debe pertenecer a la misma empresa.
+
+Facturas: `/api/facturas-proveedor`. El cuerpo acepta `empresaId`, `numeroFactura`, `proveedorId`, `fechaFactura`, `fechaVencimiento`, `moneda`, `ordenCompraId`, `recepcionId`, `montoNeto`, `montoImpuestos`, `montoTotal`, `estado`, `estadoConciliacion`, `aprobadoPagoPor`, `aprobadoPagoEn` y `creadoPor`. El total debe ser neto más impuestos, el vencimiento no puede preceder a la fecha factura, y la unicidad se aplica por empresa, proveedor y número. El saldo pendiente es calculado por PostgreSQL. No se elimina una factura vinculada a pagos.
+
+Líneas de factura: el cuerpo acepta `numeroLinea`, `ordenCompraLineaId`, `descripcion`, `cantidad`, `precioUnitario`, `montoNeto`, `montoImpuestos` y `cuentaContableId`. Crear, modificar o eliminar líneas recalcula neto, impuestos y total de la factura; una línea de orden, cuando se especifica, debe pertenecer a la orden asociada a la factura.
+
+Pagos: `/api/pagos`. El cuerpo acepta `empresaId`, `numeroPago`, `proveedorId`, `facturaId`, `fechaPago`, `monto`, `moneda`, `metodoPago`, `referencia`, `estado`, `aprobadoPor` y `ejecutadoPor`. El aprobador y ejecutor deben ser distintos. Los pagos `CONFIRMADO` recalculan el monto pagado y el estado de la factura vinculada; no pueden exceder el total. La factura debe coincidir con empresa, proveedor y moneda.
+
+Políticas: `/api/politicas-aprobacion`. El cuerpo acepta `empresaId`, `tipoTransaccion` (`FACTURA` o `PAGO`), `montoMinimo`, `montoMaximo`, `rolRequerido`, `ordenSecuencia` y `activo`. El rango máximo, si existe, no puede ser menor que el mínimo.
+
+Bitácora: `/api/bitacora-auditoria` expone CRUD completo según lo solicitado. El cuerpo acepta `tabla`, `operacion` (`INSERT`, `UPDATE` o `DELETE`), `registroId`, `datosAnteriores` y `datosNuevos` (objetos JSON o `null`). El ID, marca temporal, usuario de base de datos y transacción se generan en PostgreSQL.
+
 ## Base de datos
 
 El proyecto está configurado para usar PostgreSQL con la siguiente base por defecto:
