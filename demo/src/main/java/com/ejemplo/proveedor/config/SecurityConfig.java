@@ -80,7 +80,11 @@ public class SecurityConfig {
             securityContext.securityContextRepository(securityContextRepository))
         .csrf(csrf -> csrf
             .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
-            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+            .ignoringRequestMatchers(request ->
+                HttpMethod.POST.matches(request.getMethod())
+                    && ("/api/auth/login".equals(request.getServletPath())
+                        || "/api/auth/register".equals(request.getServletPath()))))
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authorize -> authorize
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
