@@ -8,6 +8,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -83,10 +84,10 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authorize -> authorize
             .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-            .requestMatchers(
-                "/api/auth/login",
-                "/api/auth/register",
-                "/api/auth/csrf").permitAll()
+            .requestMatchers("/error").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register")
+                .permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
             .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
             .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
             .requestMatchers("/api/bitacora/**").hasRole("ADMIN")
