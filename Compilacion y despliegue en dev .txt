@@ -1,5 +1,8 @@
 Te recomendaría dejar estos comandos documentados:
 
+# Detener
+docker compose down
+
 Shell
 # Reconstruir backend
 mvn clean package -DskipTests
@@ -16,8 +19,7 @@ docker logs -f backend-cuentapagar
 # Estado
 docker ps
  
-# Detener
-docker compose down
+
 
 Y verificar algunos puntos antes de continuar con nuevas funcionalidades:
 

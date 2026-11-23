@@ -6,6 +6,7 @@ public record VentaDetalleResponse(
     Long detalleId,
     Long idProducto,
     String codigoBarras,
+    String nombreProducto,
     Integer cantidad,
     BigDecimal precioUnitario,
     BigDecimal subtotal,

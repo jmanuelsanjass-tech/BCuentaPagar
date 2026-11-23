@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS public.bancos (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo_banco VARCHAR(20) NOT NULL UNIQUE,
+    nombre VARCHAR(150) NOT NULL,
+    nombre_corto VARCHAR(50),
+    codigo_swift_bic VARCHAR(11),
+    pais VARCHAR(2) NOT NULL DEFAULT 'MX',
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    creado_en TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

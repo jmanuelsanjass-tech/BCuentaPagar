@@ -2,6 +2,7 @@ package com.ejemplo.proveedor.controller;
 
 import com.ejemplo.proveedor.dto.ClienteRequest;
 import com.ejemplo.proveedor.dto.ClienteResponse;
+import com.ejemplo.proveedor.model.Cliente;
 import com.ejemplo.proveedor.service.ClienteService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,4 +59,11 @@ public class ClienteController {
         ? ResponseEntity.noContent().build()
         : ResponseEntity.notFound().build();
   }
+
+  @GetMapping("/buscar")
+  public List<Cliente> buscar(@RequestParam("q") String q) {
+      // Usamos 'service' que es el nombre real de tu variable
+      return service.buscarPorNombreOId(q);
+  }
+
 }

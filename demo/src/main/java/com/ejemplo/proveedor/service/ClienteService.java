@@ -93,4 +93,17 @@ public class ClienteService {
         cliente.getUsuarioAuditoria(),
         cliente.getQrCode());
   }
+
+  public List<Cliente> buscarPorNombreOId(String q) {
+    // Intentamos convertir el texto a número (por si el usuario busca por ID)
+    try {
+      Long id = Long.parseLong(q);
+      // Usamos 'repository' en minúscula
+      return repository.findByNombreContainingIgnoreCaseOrIdCliente(q, id);
+    } catch (NumberFormatException e) {
+      // Usamos 'repository' en minúscula
+      return repository.findByNombreContainingIgnoreCase(q);
+    }
+  }
+
 }

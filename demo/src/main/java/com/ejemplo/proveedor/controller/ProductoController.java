@@ -1,6 +1,7 @@
 package com.ejemplo.proveedor.controller;
 
 import com.ejemplo.proveedor.model.Producto;
+import com.ejemplo.proveedor.dto.ProductoBusquedaResponse;
 import com.ejemplo.proveedor.service.ProductoService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -37,6 +38,21 @@ public class ProductoController {
       return ResponseEntity.badRequest().build();
     }
     return ResponseEntity.ok(service.buscarPorNombre(nombre));
+  }
+
+  @GetMapping("/buscar/predictivo")
+  public ResponseEntity<List<ProductoBusquedaResponse>> buscarPredictivo(
+      @RequestParam(name = "nombre", required = false) String nombre,
+      @RequestParam(name = "termino", required = false) String termino) {
+    if ((nombre == null) == (termino == null)) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    String criterio = nombre != null ? nombre : termino;
+    if (criterio.isBlank() || criterio.trim().length() < 2 || criterio.length() > 100) {
+      return ResponseEntity.badRequest().build();
+    }
+    return ResponseEntity.ok(service.buscarPredictivo(criterio));
   }
 
   @GetMapping("/categoria")

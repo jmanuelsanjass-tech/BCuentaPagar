@@ -1,9 +1,11 @@
 package com.ejemplo.proveedor.service;
 
 import com.ejemplo.proveedor.model.Producto;
+import com.ejemplo.proveedor.dto.ProductoBusquedaResponse;
 import com.ejemplo.proveedor.repository.ProductoRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,11 @@ public class ProductoService {
   @Transactional(readOnly = true)
   public List<Producto> buscarPorNombre(String nombre) {
     return repository.findByNombreContainingIgnoreCase(nombre.trim());
+  }
+
+  @Transactional(readOnly = true)
+  public List<ProductoBusquedaResponse> buscarPredictivo(String nombre) {
+    return repository.buscarPredictivo(nombre.trim(), PageRequest.of(0, 10));
   }
 
   @Transactional(readOnly = true)

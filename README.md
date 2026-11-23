@@ -134,6 +134,16 @@ Líneas de factura: el cuerpo acepta `numeroLinea`, `ordenCompraLineaId`, `descr
 
 Pagos: `/api/pagos`. El cuerpo acepta `empresaId`, `numeroPago`, `proveedorId`, `facturaId`, `fechaPago`, `monto`, `moneda`, `metodoPago`, `referencia`, `estado`, `aprobadoPor` y `ejecutadoPor`. El aprobador y ejecutor deben ser distintos. Los pagos `CONFIRMADO` recalculan el monto pagado y el estado de la factura vinculada; no pueden exceder el total. La factura debe coincidir con empresa, proveedor y moneda.
 
+### Bancos
+
+Las rutas `/api/bancos/**` requieren `ADMIN`, `TESORERIA` o `CONTABILIDAD`.
+
+- `GET /api/bancos` y `GET /api/bancos/{id}` para consultar.
+- `POST /api/bancos` para crear; `PUT /api/bancos/{id}` para actualizar.
+- `DELETE /api/bancos/{id}` para eliminar.
+
+El cuerpo acepta `codigoBanco`, `nombre`, `nombreCorto`, `codigoSwiftBic`, `pais` y `activo`. El código es único; país usa dos letras ISO y por defecto es `MX`; SWIFT/BIC, si se proporciona, debe tener 8 u 11 caracteres alfanuméricos. `activo` es verdadero por defecto. Los timestamps se generan/actualizan en el backend. Antes del despliegue, crea la tabla con `demo/src/main/resources/db/manual/create_bancos.sql`.
+
 Políticas: `/api/politicas-aprobacion`. El cuerpo acepta `empresaId`, `tipoTransaccion` (`FACTURA` o `PAGO`), `montoMinimo`, `montoMaximo`, `rolRequerido`, `ordenSecuencia` y `activo`. El rango máximo, si existe, no puede ser menor que el mínimo.
 
 Bitácora: `/api/bitacora-auditoria` expone CRUD completo según lo solicitado. El cuerpo acepta `tabla`, `operacion` (`INSERT`, `UPDATE` o `DELETE`), `registroId`, `datosAnteriores` y `datosNuevos` (objetos JSON o `null`). El ID, marca temporal, usuario de base de datos y transacción se generan en PostgreSQL.
@@ -208,6 +218,7 @@ Asegúrate de definir las variables de entorno necesarias antes de iniciar la ap
 
 - `GET /api/productos`
 - `GET /api/productos/buscar?nombre={valor}`
+- `GET /api/productos/buscar/predictivo?nombre={valor}` (también acepta `termino`; coincidencias por nombre o código de barras; mínimo 2 caracteres)
 - `GET /api/productos/categoria?categoria={Abarrotes|Lácteos|Frutería}`
 - `GET /api/productos/id/{id}`
 - `GET /api/productos/{codigoBarras}`
@@ -235,7 +246,7 @@ Los productos se persisten en `inventario`. El código de barras es único; las 
 - `PUT /api/ventas/{id}`
 - `DELETE /api/ventas/{id}`
 
-En las operaciones de creación y actualización, el subtotal se calcula a partir de los detalles; el descuento es opcional (por defecto `0`) y el IVA es obligatorio. El total se calcula como `subtotal - descuento + iva`. La venta requiere un cliente existente.
+En las operaciones de creación y actualización, el subtotal se calcula a partir de los detalles; el descuento es opcional (por defecto `0`) y el IVA es obligatorio. El total se calcula como `subtotal - descuento + iva`. La venta requiere un cliente existente. `tipoMoneda` admite `Pesos` (efectivo) y `Tarjeta de Crédito`; en efectivo, `montoRecibido` debe cubrir el total y el servidor calcula `montoSobrante` como el cambio. Con tarjeta, el servidor fija el monto recibido al total y el sobrante en cero. `bancoCorto` es opcional y guarda el nombre corto del banco (máximo 30 caracteres). Antes del despliegue, aplica `demo/src/main/resources/db/manual/alter_ventas_pago.sql` en PostgreSQL; el script también agrega `banco_corto`.
 
 ### Cuentas por cobrar
 

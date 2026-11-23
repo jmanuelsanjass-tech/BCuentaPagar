@@ -50,6 +50,18 @@ public class Venta {
   @Column(name = "total", nullable = false, precision = 12, scale = 2)
   private BigDecimal total;
 
+  @Column(name = "monto_recibido", nullable = false, precision = 12, scale = 2)
+  private BigDecimal montoRecibido = BigDecimal.ZERO;
+
+  @Column(name = "monto_sobrante", nullable = false, precision = 12, scale = 2)
+  private BigDecimal montoSobrante = BigDecimal.ZERO;
+
+  @Column(name = "tipo_moneda", nullable = false, length = 20)
+  private String tipoMoneda = "Pesos";
+
+  @Column(name = "banco_corto", length = 30)
+  private String bancoCorto;
+
   @Column(name = "estado", length = 20, columnDefinition = "varchar(20) default 'completada'")
   private String estado = "completada";
 

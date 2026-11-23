@@ -26,6 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class VentaService {
 
   private static final BigDecimal MAX_AMOUNT = new BigDecimal("9999999999.99");
+  private static final String PAYMENT_CASH = "Pesos";
+  private static final String PAYMENT_CREDIT_CARD = "Tarjeta de Crédito";
 
   private final VentaRepository repository;
 
@@ -104,10 +106,15 @@ public class VentaService {
     }
     BigDecimal total = subtotal.subtract(descuento).add(iva).setScale(2, RoundingMode.HALF_UP);
 
+    PagoVenta pago = calcularPago(
+        total, request.montoRecibido(), request.tipoMoneda());
+
     if (subtotal.compareTo(MAX_AMOUNT) > 0
         || descuento.compareTo(MAX_AMOUNT) > 0
         || iva.compareTo(MAX_AMOUNT) > 0
-        || total.compareTo(MAX_AMOUNT) > 0) {
+        || total.compareTo(MAX_AMOUNT) > 0
+        || pago.montoRecibido().compareTo(MAX_AMOUNT) > 0
+        || pago.montoSobrante().compareTo(MAX_AMOUNT) > 0) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Los importes exceden el máximo permitido para una venta");
     }
@@ -117,6 +124,10 @@ public class VentaService {
     venta.setDescuento(descuento);
     venta.setIva(iva);
     venta.setTotal(total);
+    venta.setMontoRecibido(pago.montoRecibido());
+    venta.setMontoSobrante(pago.montoSobrante());
+    venta.setTipoMoneda(pago.tipoMoneda());
+    venta.setBancoCorto(limpiarBancoCorto(request.bancoCorto()));
     if (request.estado() != null) {
       venta.setEstado(request.estado());
     }
@@ -153,12 +164,44 @@ public class VentaService {
     return authentication.getName();
   }
 
+  static PagoVenta calcularPago(
+      BigDecimal total, BigDecimal montoRecibidoRequest, String tipoMonedaRequest) {
+    String tipoMoneda = tipoMonedaRequest == null || tipoMonedaRequest.isBlank()
+        ? PAYMENT_CASH
+        : tipoMonedaRequest.trim();
+    if (PAYMENT_CREDIT_CARD.equals(tipoMoneda)) {
+      return new PagoVenta(total, BigDecimal.ZERO.setScale(2), tipoMoneda);
+    }
+    if (!PAYMENT_CASH.equals(tipoMoneda)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "El tipo de pago debe ser Pesos o Tarjeta de Crédito");
+    }
+
+    BigDecimal montoRecibido = montoRecibidoRequest == null
+        ? total
+        : montoRecibidoRequest.setScale(2, RoundingMode.HALF_UP);
+    if (montoRecibido.compareTo(total) < 0) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "El monto recibido no puede ser menor que el total");
+    }
+    BigDecimal montoSobrante = montoRecibido.subtract(total).setScale(2, RoundingMode.HALF_UP);
+    return new PagoVenta(montoRecibido, montoSobrante, tipoMoneda);
+  }
+
+  record PagoVenta(BigDecimal montoRecibido, BigDecimal montoSobrante, String tipoMoneda) {
+  }
+
+  private String limpiarBancoCorto(String bancoCorto) {
+    return bancoCorto == null || bancoCorto.isBlank() ? null : bancoCorto.trim();
+  }
+
   private VentaResponse toResponse(Venta venta) {
     List<VentaDetalleResponse> detalles = venta.getDetalles().stream()
         .map(detalle -> new VentaDetalleResponse(
             detalle.getDetalleId(),
             detalle.getProducto().getIdProducto(),
             detalle.getProducto().getCodigoBarras(),
+            detalle.getProducto().getNombre(),
             detalle.getCantidad(),
             detalle.getPrecioUnitario(),
             detalle.getSubtotal(),
@@ -174,6 +217,10 @@ public class VentaService {
         venta.getDescuento(),
         venta.getIva(),
         venta.getTotal(),
+        venta.getMontoRecibido(),
+        venta.getMontoSobrante(),
+        venta.getTipoMoneda(),
+        venta.getBancoCorto(),
         venta.getEstado(),
         venta.getUsuarioAuditoria(),
         venta.getFechaAuditoria(),

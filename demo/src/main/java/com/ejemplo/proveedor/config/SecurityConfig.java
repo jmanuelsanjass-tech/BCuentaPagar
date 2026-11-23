@@ -98,8 +98,12 @@ public class SecurityConfig {
             .requestMatchers("/api/roles/**").hasRole("ADMIN")
             .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "VENTAS")
             .requestMatchers("/api/clientes/**").hasAnyRole("ADMIN", "VENTAS")
-            .requestMatchers("/api/inventarios/**", "/api/productos/**")
+
+            .requestMatchers(HttpMethod.GET, "/api/productos/**")
+                .hasAnyRole("ADMIN", "INVENTARIOS", "VENTAS")            
+                .requestMatchers("/api/inventarios/**", "/api/productos/**")
                 .hasAnyRole("ADMIN", "INVENTARIOS")
+                
             .requestMatchers("/api/proveedores/**").hasAnyRole("ADMIN", "INVENTARIOS")
             .requestMatchers("/api/cuentas-contables/**")
                 .hasAnyRole("ADMIN", "COMPRAS", "CONTABILIDAD", "INVENTARIOS")
@@ -109,8 +113,9 @@ public class SecurityConfig {
                 .hasAnyRole("ADMIN", "RECEPCION", "INVENTARIOS")
             .requestMatchers("/api/facturas-proveedor/**")
                 .hasAnyRole("ADMIN", "CONTABILIDAD")
-            .requestMatchers("/api/pagos/**")
-                .hasAnyRole("ADMIN", "TESORERIA", "CONTABILIDAD")
+            // Busca donde tenías los bancos y reemplázalo por esto:
+            .requestMatchers("/api/bancos/**")
+            .hasAnyAuthority("ROLE_ADMIN", "ROLE_TESORERIA", "ROLE_CONTABILIDAD", "ROLE_VENTAS")
             .requestMatchers("/api/politicas-aprobacion/**").hasRole("ADMIN")
             .requestMatchers(HttpMethod.GET, "/api/bitacora-auditoria/**")
                 .hasAnyRole("ADMIN", "AUDITOR")
