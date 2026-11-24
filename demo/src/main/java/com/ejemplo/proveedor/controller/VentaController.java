@@ -40,6 +40,10 @@ public class VentaController {
 
   @PostMapping
   public ResponseEntity<VentaResponse> crear(@Valid @RequestBody VentaRequest request) {
+    System.out.println("=================================");
+    System.out.println("ENTRO AL POST DE VENTAS");
+    System.out.println(request);
+    System.out.println("=================================");
     return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(request));
   }
 
