@@ -45,9 +45,8 @@ public class Producto {
     @Column(name = "descripcion", columnDefinition = "text")
     private String descripcion;
 
-    @Pattern(regexp = "Abarrotes|Lácteos|Frutería", message = "La categoría debe ser Abarrotes, Lácteos o Frutería")
-    @Column(name = "categoria", nullable = false, length = 50, columnDefinition = "varchar(50) default 'Abarrotes'")
-    private String categoria = "Abarrotes";
+    @Pattern(regexp = "Abarrotes secos y enlatados|Refrigerados y lácteos|Frutas, verduras y panadería|Bebidas y botanas|Limpieza e higiene personal", message = "La categoría no es válida según el catálogo.")
+    private String categoria;
 
     @NotNull(message = "El precio es obligatorio")
     @DecimalMin(value = "0.00", inclusive = false, message = "El precio debe ser mayor que cero")

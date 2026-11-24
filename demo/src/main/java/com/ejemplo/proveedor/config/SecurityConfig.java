@@ -76,22 +76,24 @@ public class SecurityConfig {
         http.authenticationProvider(authenticationProvider)
                 .securityContext(
                         securityContext -> securityContext.securityContextRepository(securityContextRepository))
-                // DESACTIVAMOS CSRF PARA QUE LOS POST FUNCIONEN SIN TOKEN
+                // DESACTIVAMOS CSRF
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
+                // AQUÍ EMPIEZA LA CADENA DE AUTORIZACIÓN
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
                         .requestMatchers("/api/bitacora/**").hasRole("ADMIN")
                         .requestMatchers("/api/roles/**").hasRole("ADMIN")
                         .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "VENTAS")
                         .requestMatchers("/api/clientes/**").hasAnyRole("ADMIN", "VENTAS")
 
-                        // CORRECCIÓN DE SINTAXIS AQUÍ:
+                        // REGLA CORREGIDA PARA PRODUCTOS
                         .requestMatchers(HttpMethod.GET, "/api/productos/**")
                         .hasAnyRole("ADMIN", "INVENTARIOS", "VENTAS")
                         .requestMatchers("/api/inventarios/**", "/api/productos/**")
