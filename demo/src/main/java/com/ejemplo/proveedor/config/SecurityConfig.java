@@ -11,25 +11,28 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.http.SessionCreationPolicy; // NUEVA IMPORTACIÓN
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // NUEVA IMPORTACIÓN
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 import com.ejemplo.proveedor.service.UserDetailsServiceImpl;
+import com.ejemplo.proveedor.security.JwtAuthenticationFilter; // NUEVA IMPORTACIÓN
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthFilter; // INYECTAMOS EL FILTRO
 
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationFilter jwtAuthFilter) {
         this.userDetailsService = userDetailsService;
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @Bean
@@ -50,11 +53,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository();
-    }
-
-    @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
@@ -71,15 +69,16 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            AuthenticationProvider authenticationProvider,
-            SecurityContextRepository securityContextRepository) throws Exception {
+            AuthenticationProvider authenticationProvider) throws Exception {
+        
         http.authenticationProvider(authenticationProvider)
-                .securityContext(
-                        securityContext -> securityContext.securityContextRepository(securityContextRepository))
-                // DESACTIVAMOS CSRF
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
-                // AQUÍ EMPIEZA LA CADENA DE AUTORIZACIÓN
+                // ¡VITAL! Le decimos a Spring que NO guarde sesiones (STATELESS)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Agregamos el filtro antes del filtro por defecto
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
@@ -93,7 +92,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "VENTAS")
                         .requestMatchers("/api/clientes/**").hasAnyRole("ADMIN", "VENTAS")
 
-                        // REGLA CORREGIDA PARA PRODUCTOS
                         .requestMatchers(HttpMethod.GET, "/api/productos/**")
                         .hasAnyRole("ADMIN", "INVENTARIOS", "VENTAS")
                         .requestMatchers("/api/inventarios/**", "/api/productos/**")
