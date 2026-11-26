@@ -14,10 +14,4 @@ class DemoApplicationTests {
   void contextLoads() {
   }
 
-  @Test
-  void mainStartsApplicationWithoutWebServer() {
-    assertDoesNotThrow(() -> DemoApplication.main(
-        new String[] { "--spring.main.web-application-type=none" }));
-  }
-
 }

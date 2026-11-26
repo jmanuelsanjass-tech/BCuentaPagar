@@ -2,20 +2,13 @@ package com.ejemplo.proveedor.controller;
 
 import com.ejemplo.proveedor.model.Producto;
 import com.ejemplo.proveedor.dto.ProductoBusquedaResponse;
+import com.ejemplo.proveedor.dto.ProductoRequest;
 import com.ejemplo.proveedor.service.ProductoService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -57,8 +50,16 @@ public class ProductoController {
 
   @GetMapping("/categoria")
   public ResponseEntity<List<Producto>> buscarPorCategoria(@RequestParam String categoria) {
-    if (categoria.isBlank()
-        || !List.of("Abarrotes", "Lácteos", "Frutería").contains(categoria.trim())) {
+    // CORREGIDO: Lista actualizada con las 5 categorías reales
+    List<String> categoriasValidas = List.of(
+        "Abarrotes secos y enlatados",
+        "Refrigerados y lácteos",
+        "Frutas, verduras y panadería",
+        "Bebidas y botanas",
+        "Limpieza e higiene personal"
+    );
+    
+    if (categoria.isBlank() || !categoriasValidas.contains(categoria.trim())) {
       return ResponseEntity.badRequest().build();
     }
     return ResponseEntity.ok(service.buscarPorCategoria(categoria));
@@ -78,18 +79,24 @@ public class ProductoController {
         .orElse(ResponseEntity.notFound().build());
   }
 
-  @PostMapping
-  public ResponseEntity<Producto> crear(@Valid @RequestBody Producto producto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(producto));
-  }
+@PostMapping
+public ResponseEntity<Producto> crear(
+        @Valid @RequestBody ProductoRequest request) {
 
-  @PutMapping("/id/{idProducto}")
-  public ResponseEntity<Producto> actualizarPorId(
-      @PathVariable Long idProducto, @Valid @RequestBody Producto producto) {
-    return service.actualizar(idProducto, producto)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
-  }
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(service.crear(request));
+}
+
+@PutMapping("/id/{idProducto}")
+public ResponseEntity<Producto> actualizarPorId(
+        @PathVariable Long idProducto,
+        @Valid @RequestBody ProductoRequest request) {
+
+    return service.actualizar(idProducto, request)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+}
 
   @PutMapping("/{codigoBarras}")
   public ResponseEntity<Producto> actualizarPorCodigoBarras(

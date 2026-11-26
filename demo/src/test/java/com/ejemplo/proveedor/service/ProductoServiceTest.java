@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.ejemplo.proveedor.controller.ProductoController;
 import com.ejemplo.proveedor.dto.ProductoBusquedaResponse;
+import com.ejemplo.proveedor.dto.ProductoRequest;
 import com.ejemplo.proveedor.model.Producto;
 import com.ejemplo.proveedor.repository.ProductoRepository;
 import java.math.BigDecimal;
@@ -17,43 +18,84 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.Test;
+import com.ejemplo.proveedor.repository.ProveedorRepository;
+import java.util.Optional;
+import com.ejemplo.proveedor.model.Proveedor;
 
 class ProductoServiceTest {
 
   @Test
   void crearAplicaValoresPorDefectoDeInventario() {
+
     ProductoRepository repository = mock(ProductoRepository.class);
+
+    ProveedorRepository proveedorRepository = mock(ProveedorRepository.class);
+
     when(repository.saveAndFlush(any(Producto.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
-    ProductoService service = new ProductoService(repository);
 
-    Producto datos = new Producto();
-    datos.setNombre("Arroz");
-    datos.setPrecio(new BigDecimal("25.50"));
-    datos.setCodigoBarras("7501234567890");
+    Proveedor proveedor = new Proveedor();
+    proveedor.setIdProveedor(1L);
+
+    when(proveedorRepository.findById(1L))
+        .thenReturn(Optional.of(proveedor));
+
+    ProductoService service = new ProductoService(
+        repository,
+        proveedorRepository);
+
+    ProductoRequest datos = new ProductoRequest(
+        "7501234567890",
+        "Arroz",
+        "",
+        "Abarrotes secos y enlatados",
+        new BigDecimal("25.50"),
+        0,
+        "activo",
+        1L);
 
     Producto creado = service.crear(datos);
 
-    assertEquals("Abarrotes", creado.getCategoria());
+    assertEquals(
+        "Abarrotes secos y enlatados",
+        creado.getCategoria());
+
     assertEquals(0, creado.getStock());
-    assertEquals("activo", creado.getEstado());
+
+    assertEquals("activo",
+        creado.getEstado());
   }
 
   @Test
   void buscarPredictivoRecortaElNombreYLimitaResultados() {
     ProductoRepository repository = mock(ProductoRepository.class);
+    ProveedorRepository proveedorRepository = mock(ProveedorRepository.class);
+
     ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+
     ProductoBusquedaResponse producto = new ProductoBusquedaResponse(
-        1L, "7501234567890", "Café", "Café molido", "Abarrotes",
-        new BigDecimal("89.50"), 7);
-    when(repository.buscarPredictivo(eq("cafe"), any(Pageable.class)))
+        1L,
+        "7501234567890",
+        "Café",
+        "Café molido",
+        "Abarrotes",
+        new BigDecimal("89.50"),
+        7);
+
+    when(repository.buscarPredictivo(
+        eq("cafe"),
+        any(Pageable.class)))
         .thenReturn(List.of(producto));
-    ProductoService service = new ProductoService(repository);
+
+    ProductoService service = new ProductoService(repository, proveedorRepository);
 
     List<ProductoBusquedaResponse> resultados = service.buscarPredictivo("  cafe  ");
 
     assertEquals(List.of(producto), resultados);
-    verify(repository).buscarPredictivo(eq("cafe"), pageableCaptor.capture());
+
+    verify(repository)
+        .buscarPredictivo(eq("cafe"), pageableCaptor.capture());
+
     assertEquals(10, pageableCaptor.getValue().getPageSize());
   }
 

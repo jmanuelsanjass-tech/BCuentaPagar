@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.DecimalMin;
@@ -24,9 +27,11 @@ import org.hibernate.annotations.Check;
 @Table(name = "inventarios", schema = "public", uniqueConstraints = @UniqueConstraint(name = "uk_inventario_codigo_barras", columnNames = "codigo_barras"), indexes = {
         @Index(name = "idx_productos_nombre", columnList = "nombre"),
         @Index(name = "idx_productos_categoria", columnList = "categoria"),
-        @Index(name = "idx_productos_codigobarras", columnList = "codigo_barras")
+        @Index(name = "idx_productos_codigobarras", columnList = "codigo_barras"),
+        @Index(name = "idx_inventarios_proveedor", columnList = "id_proveedor") // NUEVO ÍNDICE
 })
-@Check(name = "chk_categoria", constraints = "categoria IN ('Abarrotes','Lácteos','Frutería')")
+// CORREGIDO: Se actualizó la regla para que coincida con las categorías reales
+@Check(name = "chk_categoria", constraints = "categoria IN ('Abarrotes secos y enlatados','Refrigerados y lácteos','Frutas, verduras y panadería','Bebidas y botanas','Limpieza e higiene personal')")
 @Check(name = "chk_inventario_precio", constraints = "precio > 0")
 @Check(name = "chk_inventario_stock", constraints = "stock >= 0")
 @Data
@@ -80,4 +85,11 @@ public class Producto {
 
     @Column(name = "qr_code", columnDefinition = "bytea")
     private byte[] qrCode;
+
+    // ==========================================
+    // NUEVA RELACIÓN CON PROVEEDOR
+    // ==========================================
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_proveedor") // Nombre de la columna en la BD
+    private Proveedor proveedor;
 }

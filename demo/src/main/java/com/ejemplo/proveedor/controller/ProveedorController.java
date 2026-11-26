@@ -26,6 +26,14 @@ public class ProveedorController {
     return service.listar();
   }
 
+@GetMapping("/buscar")
+public ResponseEntity<List<Proveedor>> buscar(
+        @RequestParam String q) {
+
+    return ResponseEntity.ok(
+        service.buscarPredictivo(q)
+    );
+}
   @GetMapping("/{id}")
   public ResponseEntity<Proveedor> obtener(@PathVariable Long id) {
     return service.obtener(id)

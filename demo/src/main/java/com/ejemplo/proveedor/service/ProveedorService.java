@@ -17,6 +17,13 @@ public class ProveedorService {
   public ProveedorService(ProveedorRepository repository) {
     this.repository = repository;
   }
+  
+public List<Proveedor> buscarPredictivo(
+        String texto) {
+
+    return repository
+            .findTop10ByNombreContainingIgnoreCase(texto);
+}
 
   @Transactional(readOnly = true)
   public List<Proveedor> listar() {
